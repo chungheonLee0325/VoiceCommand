@@ -10,9 +10,13 @@ from module import transcribe_audio, generate_unreal_code, JSONparser
 from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import PydanticOutputParser
+from module2 import *
+
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-llm =llm = ChatGoogleGenerativeAI(model='gemini-1.5-pro')
+#llm =llm = ChatGoogleGenerativeAI(model='gemini-1.5-pro')
+
+load_json_data()
 
 app = FastAPI()
 
@@ -39,8 +43,33 @@ async def convert_audio(file: UploadFile = File(...)):
         return chain.invoke(text)
     except:
         return {'error':"ERROR! PLEASE PRONOUNCE RIGHTLY"}
+
+
+
+@app.post("/generate_Json")
+async def convert_audio(file: UploadFile = File(...)):
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+            tmp.write(await file.read())
+            tmp_path = tmp.name
+        text = transcribe_audio(tmp_path)
+        os.remove(tmp_path)
+        initialize_model()
+        pals_data, items_data, tasks_data = load_json_data()
+        pals_names = {pal["name"]: pal["name"] for pal in pals_data}
+        tasks_names = {task["name"]: task["name"] for task in tasks_data}
+        items_names = {item["name"]: item["name"] for item in items_data}
+        llm_chain = setup_llm_chain(pals_names, tasks_names, items_names)
+        user_command=text
+        result = extract_command(user_command, llm_chain, pals_names, tasks_names, items_names)
+        return json.dumps(result, indent=4, ensure_ascii=False)
+    except:
+        return {'error':"ERROR! PLEASE PRONOUNCE RIGHTLY"}
     
-  
+
+
+
+
 
 
 

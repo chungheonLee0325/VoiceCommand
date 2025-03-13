@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
+from module import JSONparser
+from langchain_core.output_parsers import PydanticOutputParser
+
 
 def initialize_model():
     """환경 변수 로드 및 Google Gemini API 설정"""
