@@ -77,6 +77,8 @@ void ABaseResourceObject::OnDestroy()
 // 부분 자원 스폰 함수 (구간별 개별 처리)
 void ABaseResourceObject::SpawnPartialResources(int32 SegmentsLost)
 {
+	// ToDo: delete
+	HealthComponent->IncreaseHP(dt_ResourceObject->HPMax);
 	// 각 구간별로 개별적으로 처리
 	for (int32 SegmentIdx = 0; SegmentIdx < SegmentsLost; ++SegmentIdx)
 	{
