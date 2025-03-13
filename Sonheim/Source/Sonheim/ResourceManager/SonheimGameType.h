@@ -135,6 +135,9 @@ enum class EAiStateType : uint8
 	Chase UMETA(DisplayName = "Chase"),
 	Return UMETA(DisplayName = "Return"),
 	DoNothing UMETA(DisplayName = "DoNothing"),
+	SelectAction UMETA(DisplayName = "SelectAction"),
+	Lumbering UMETA(DisplayName = "Lumbering"),
+	
 };
 
 // 공격시 Trace System에서 사용 - EnableCollisionNotifyState 참조

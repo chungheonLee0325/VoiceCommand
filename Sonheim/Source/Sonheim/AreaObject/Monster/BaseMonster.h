@@ -11,6 +11,7 @@ class UWidgetComponent;
 class USkillBag;
 class UBaseAiFSM;
 class UBaseSkill;
+class ABaseResourceObject;
 //struct FAIStimulus;
 
 UCLASS()
@@ -51,6 +52,8 @@ protected:
 	UPROPERTY()
 	AAreaObject* m_AggroTarget;
 	UPROPERTY()
+	ABaseResourceObject* m_ResourceTarget;
+	UPROPERTY()
 	FVector m_SpawnLocation;
 	UPROPERTY(VisibleAnywhere)
 	UBaseAiFSM* m_AiFSM;
@@ -87,7 +90,7 @@ public:
 	// Combat System
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void SetAggroTarget(AAreaObject* NewTarget) { m_AggroTarget = NewTarget; }
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	float GetDistToTarget();
 
@@ -103,6 +106,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	float GetSightLength();
 
+	// Resource
+	UFUNCTION(BlueprintCallable, Category = "Resource")
+	virtual ABaseResourceObject* GetResourceTarget() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "Resource")
+	virtual void SetResourceTarget(ABaseResourceObject* NewTarget) { m_ResourceTarget = NewTarget; }
+	
 	// Skill
 	void RemoveSkillEntryByID(const int id);
 	void AddSkillEntryByID(const int id);

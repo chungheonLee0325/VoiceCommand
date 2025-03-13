@@ -227,6 +227,11 @@ float ABaseMonster::GetSightLength()
 	return SightRadius;
 }
 
+ABaseResourceObject* ABaseMonster::GetResourceTarget() const
+{
+	return m_ResourceTarget;
+}
+
 void ABaseMonster::OnDie()
 {
 	Super::OnDie();
