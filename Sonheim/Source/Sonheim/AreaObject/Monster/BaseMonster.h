@@ -51,6 +51,10 @@ public:
 
 	// Resource
 	int32 GotResource{};
+
+	// 운반 중?
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsTransporting{false};
 	
 	UPROPERTY()
 	FTimerHandle OnDieHandle;
@@ -130,6 +134,10 @@ public:
 	void Surprise();
 	void CalmDown();
 
+	// 짐 들기
+	void StartTransport();
+	void EndTransport();
+	
 	// 얼굴 변화
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeFace(int32 Feel);

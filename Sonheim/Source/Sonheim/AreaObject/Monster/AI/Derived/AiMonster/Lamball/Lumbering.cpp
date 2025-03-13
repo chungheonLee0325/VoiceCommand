@@ -145,7 +145,7 @@ void ULumbering::Lumbering(float dt)
 			MonsterState = 2;
 			bIsLumbering = false;
 			ActionTime = 0.f;
-
+			
 			// 바닥에 자원있으면 머리에 올리자
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(),ItemArr);
 
@@ -164,6 +164,9 @@ void ULumbering::Lumbering(float dt)
 						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
+
+						// 하나라도 있으면 운반 중
+						m_Owner->StartTransport();
 					}
 					if (i == 2)
 					{
@@ -226,6 +229,7 @@ void ULumbering::MoveToStore()
 			MonsterState = 3;
 			bIsMoving = false;
 			ActionTime = 0.f;
+			m_Owner->EndTransport();
 		}
 	}
 }

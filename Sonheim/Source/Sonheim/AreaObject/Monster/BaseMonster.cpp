@@ -290,6 +290,16 @@ void ABaseMonster::CalmDown()
 	ChangeFace(0);
 }
 
+void ABaseMonster::StartTransport()
+{
+	bIsTransporting = true;
+}
+
+void ABaseMonster::EndTransport()
+{
+	bIsTransporting = false;
+}
+
 void ABaseMonster::RemoveSkillEntryByID(const int id)
 {
 	m_SkillRoulette->RemoveSkillEntryByID(id);
