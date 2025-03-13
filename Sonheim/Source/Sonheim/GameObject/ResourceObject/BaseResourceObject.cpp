@@ -4,6 +4,7 @@
 #include "BaseResourceObject.h"
 
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Sonheim/GameManager/SonheimGameInstance.h"
 #include "Sonheim/GameManager/SonheimGameMode.h"
 #include "Sonheim/GameObject/Items/BaseItem.h"
@@ -42,7 +43,7 @@ void ABaseResourceObject::BeginPlay()
 	dt_ResourceObject = m_GameInstance->GetDataResourceObject(m_ResourceObjectID);
 
 	HealthComponent->InitHealth(dt_ResourceObject->HPMax);
-	
+
 	// GameMode Setting
 	m_GameMode = Cast<ASonheimGameMode>(GetWorld()->GetAuthGameMode());
 }
@@ -219,6 +220,10 @@ float ABaseResourceObject::TakeDamage(float Damage, const FDamageEvent& DamageEv
 	if (dt_ResourceObject->HarvestSoundID != 0)
 	{
 		m_GameMode->PlayPositionalSound(dt_ResourceObject->HarvestSoundID, GetActorLocation());
+	}
+	if (dt_ResourceObject->HarvestEffect != nullptr)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), dt_ResourceObject->HarvestEffect, SpawnLocation);
 	}
 
 	return ActualDamage;
