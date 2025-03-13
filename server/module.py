@@ -1,9 +1,16 @@
 from dotenv import load_dotenv
 import os
 import whisper
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import PromptTemplate
+from pydantic import BaseModel, Field
+
 
 GEMINI_API_KEY = os.getenv('GOOGLE_API_KEY')
 stt_model=whisper.load_model('base')
+
+
+#### 오디오 STT 코드 부분과, 입력 받은 텍스트를 LLM을 거쳐 json으로 전환해주는 함수
 
 def transcribe_audio(file_path: str) -> str:
     result = stt_model.transcribe(file_path)
@@ -23,3 +30,12 @@ def generate_unreal_code(text: str) -> str:
         return response.json().get("candidates")[0]["output"]
     else:
         raise HTTPException(status_code=500, detail="Failed to generate Unreal code")
+    
+
+
+#Pydantic 객체 프롬프트/ 파서 등 llm에 필요한 class및 메서드
+class JSONparser(BaseModel):
+    actor: str = Field(description="명령할 팰 ['Lamball', 'Pengullet', 'anyone']")
+    work: str =Field(...,description="수행할 액션 ['Lumbering', 'Mining', 'Transporting', 'Handwork', 'Kindling', 'Planting', 'Watering', 'Gathering']")
+    target: str = Field(description="액션을 수행할 객체 ['Ore','Stone','Sulfur','Coal','Wood','Tree']")
+    forced: bool = Field(description="강제성이나 긴급함 여부 [True,False]")
