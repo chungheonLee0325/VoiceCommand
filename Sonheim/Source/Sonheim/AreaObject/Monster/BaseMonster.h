@@ -44,6 +44,13 @@ public:
 
 	// 몬스터 속도 변화
 	bool bIsWarning{false};
+
+	// 놀라기
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsSurprise{false};
+
+	// Resource
+	int32 GotResource{};
 	
 	UPROPERTY()
 	FTimerHandle OnDieHandle;
@@ -118,6 +125,14 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Resource")
 	virtual void SetResourceTarget(ABaseResourceObject* NewTarget) { m_ResourceTarget = NewTarget; }
+
+	// 놀라기
+	void Surprise();
+	void CalmDown();
+
+	// 얼굴 변화
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeFace(int32 Feel);
 	
 	// Skill
 	void RemoveSkillEntryByID(const int id);

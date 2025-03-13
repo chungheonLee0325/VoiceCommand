@@ -276,6 +276,20 @@ void ABaseMonster::InitializeHUD()
 	}
 }
 
+void ABaseMonster::Surprise()
+{
+	bIsSurprise = true;
+	// Ouch Face
+	ChangeFace(2);
+}
+
+void ABaseMonster::CalmDown()
+{
+	bIsSurprise = false;
+	// Smile Face
+	ChangeFace(0);
+}
+
 void ABaseMonster::RemoveSkillEntryByID(const int id)
 {
 	m_SkillRoulette->RemoveSkillEntryByID(id);

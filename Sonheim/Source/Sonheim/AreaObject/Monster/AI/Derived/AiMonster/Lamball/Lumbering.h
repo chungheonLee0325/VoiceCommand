@@ -39,4 +39,13 @@ public:
 	
 	UPROPERTY()
 	AActor* Target{nullptr};
+
+	UPROPERTY()
+	TArray<AActor*> TargetArr;
+
+	UPROPERTY()
+	TArray<AActor*> ItemArr;
+
+	UPROPERTY()
+	TArray<ABaseItem*> HaveItemArr;
 };

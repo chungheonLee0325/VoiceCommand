@@ -20,10 +20,16 @@ public:
 	virtual void Enter() override;
 	virtual void Execute(float dt) override;
 	virtual void Exit() override;
-
+	
 	UFUNCTION()
 	void OnSkillCompleted();
 
 	UFUNCTION()
 	void OnSkillCanceled();
+
+	float FlowTime{};
+	float ReadyTime{1.5f};
+
+	const int MaxWorkCount = 5;
+	int WorkCount = 0;
 };
