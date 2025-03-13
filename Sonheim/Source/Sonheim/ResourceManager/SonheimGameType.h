@@ -139,6 +139,7 @@ enum class EAiSkillType : uint8
 	Middle UMETA(DisplayName = "Middle"),
 	Long UMETA(DisplayName = "Long"),
 	Grappling UMETA(DisplayName = "Grappling"),
+
 };
 
 // AiFSM을 위한 Enum Type
@@ -153,6 +154,9 @@ enum class EAiStateType : uint8
 	Chase UMETA(DisplayName = "Chase"),
 	Return UMETA(DisplayName = "Return"),
 	DoNothing UMETA(DisplayName = "DoNothing"),
+	SelectAction UMETA(DisplayName = "SelectAction"),
+	Lumbering UMETA(DisplayName = "Lumbering"),
+	ReturnResource UMETA(DisplayName = "ReturnResource")
 };
 
 // 공격시 Trace System에서 사용 - EnableCollisionNotifyState 참조

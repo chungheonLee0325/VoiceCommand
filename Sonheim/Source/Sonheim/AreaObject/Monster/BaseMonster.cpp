@@ -8,7 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 //#include "Perception/AIPerceptionComponent.h"
 //#include "Perception/AISenseConfig_Sight.h"
+#include "AIController.h"
 #include "BaseSkillRoulette.h"
+#include "AI/Base/BaseAIController.h"
 #include "Sonheim/AreaObject/Attribute/StaminaComponent.h"
 #include "Sonheim/AreaObject/Player/SonheimPlayer.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
@@ -120,7 +122,9 @@ UBaseSkillRoulette* ABaseMonster::CreateSkillRoulette()
 void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	AIController = Cast<AAIController>(GetController());
+	
 	// HP UI 위치, Visible Setting
 	if (dt_AreaObject->EnemyType != EEnemyType::Boss)
 	{
@@ -225,6 +229,11 @@ FVector ABaseMonster::GetSpawnLocation()
 float ABaseMonster::GetSightLength()
 {
 	return SightRadius;
+}
+
+ABaseResourceObject* ABaseMonster::GetResourceTarget() const
+{
+	return m_ResourceTarget;
 }
 
 void ABaseMonster::OnDie()
