@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Sonheim/AreaObject/Monster/AI/Base/BaseAiState.h"
-#include "Lumbering.generated.h"
+#include "WaitState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SONHEIM_API ULumbering : public UBaseAiState
+class SONHEIM_API UWaitState : public UBaseAiState
 {
 	GENERATED_BODY()
 
@@ -20,23 +20,5 @@ public:
 	virtual void Enter() override;
 	virtual void Execute(float dt) override;
 	virtual void Exit() override;
-
-	int32 CheckState();
 	
-	void MoveToLumber();
-	void Lumbering(float dt);
-	void MoveToStore();
-	void StoreLumber(float dt);
-	
-	int32 MonsterState{0};
-	
-	bool bIsMoving{false};
-	bool bIsLumbering{false};
-	
-	float ActionTime{0.f};
-	float LumberingTime{3.f};
-	float StoreTime{1.f};
-	
-	UPROPERTY()
-	AActor* Target{nullptr};
 };

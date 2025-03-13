@@ -29,4 +29,6 @@ public:
 	UBaseAiFSM* CreateFSM();
 	
 	virtual void SetAggroTarget(AAreaObject* NewTarget) { m_AggroTarget = NewTarget; }
+
+
 };

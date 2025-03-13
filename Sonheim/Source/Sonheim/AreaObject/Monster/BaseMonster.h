@@ -38,6 +38,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float HeightHPUI = 160.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	class AAIController* AIController;
+
+	// 몬스터 속도 변화
+	bool bIsWarning{false};
 	
 	UPROPERTY()
 	FTimerHandle OnDieHandle;

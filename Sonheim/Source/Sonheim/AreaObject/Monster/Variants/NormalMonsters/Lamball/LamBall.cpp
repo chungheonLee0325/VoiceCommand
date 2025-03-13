@@ -2,6 +2,7 @@
 
 
 #include "LamBall.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Sonheim/AreaObject/Monster/AI/Derived/AiMonster/Lamball/LamballFSM.h"
 
@@ -15,6 +16,7 @@ ALamBall::ALamBall()
 	m_AreaObjectID = 103;
 
  	m_AiFSM = ALamBall::CreateFSM();
+	m_SkillRoulette = ABaseMonster::CreateSkillRoulette();
 	
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh
 		(TEXT("/Script/Engine.SkeletalMesh'/Game/_Resource/Monster/Lamball/SK_SheepBall_LOD0.SK_SheepBall_LOD0'"));
@@ -34,7 +36,7 @@ ALamBall::ALamBall()
 void ALamBall::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame

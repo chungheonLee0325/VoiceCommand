@@ -5,7 +5,7 @@
 
 #include "Lumbering.h"
 #include "SelectAction.h"
-#include "Wait.h"
+#include "WaitState.h"
 
 
 // Sets default values for this component's properties
@@ -41,7 +41,7 @@ void ULamballFSM::InitStatePool()
 	//Super::InitStatePool();
 
 	// Wait 
-	auto Wait = CreateState<UWait>(this, m_Owner, EAiStateType::SelectAction);
+	auto Wait = CreateState<UWaitState>(this, m_Owner, EAiStateType::SelectAction);
 	AddState(EAiStateType::Wait, Wait);
 
 	// SelectAction 
@@ -51,6 +51,10 @@ void ULamballFSM::InitStatePool()
 	// Lumbering 
 	auto Lumbering = CreateState<ULumbering>(this, m_Owner, EAiStateType::Wait);
 	AddState(EAiStateType::Lumbering, Lumbering);
+
+	// ReturnResource 
+	auto ReturnResource = CreateState<ULumbering>(this, m_Owner, EAiStateType::Lumbering);
+	AddState(EAiStateType::ReturnResource, ReturnResource);
 
 	// 시작 State
 	ChangeState(EAiStateType::Wait);
