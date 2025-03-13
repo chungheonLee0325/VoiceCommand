@@ -1,19 +1,13 @@
 from dotenv import load_dotenv
+import os
+import whisper
 
-GEMINI_API_KEY = load_dotenv('GOOGLE_API_KEY')
+GEMINI_API_KEY = os.getenv('GOOGLE_API_KEY')
+stt_model=whisper.load_model('base')
 
 def transcribe_audio(file_path: str) -> str:
-    with open(file_path, "rb") as audio_file:
-        content = audio_file.read()
-    audio = speech.RecognitionAudio(content=content)
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code="en-US"
-    )
-    response = client.recognize(config=config, audio=audio)
-    texts = [result.alternatives[0].transcript for result in response.results]
-    return " ".join(texts) if texts else ""
+    result = stt_model.transcribe(file_path)
+    return result["text"].strip()
 
 def generate_unreal_code(text: str) -> str:
     url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateText?key={GEMINI_API_KEY}"
