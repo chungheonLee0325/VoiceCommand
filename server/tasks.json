@@ -1,0 +1,52 @@
+{
+  "tasks": [
+      {
+          "name": "Lumbering",
+          "description": "Chopping down trees for wood.",
+          "targets": ["Tree"],
+          "destination": "Logging Site"
+      },
+      {
+          "name": "Mining",
+          "description": "Extracting minerals and ores.",
+          "targets": ["Stone", "Ore"],
+          "destination": "Stone Pit"
+      },
+      {
+          "name": "Transporting",
+          "description": "Moving items to designated locations.",
+          "targets": ["Item"],
+          "destination": "Storage"
+      },
+      {
+          "name": "Handwork",
+          "description": "Construction and crafting work.",
+          "targets": ["Construction", "Primitive Workbench"],
+          "destination": "Build Site"
+      },
+      {
+          "name": "Kindling",
+          "description": "Starting fires and cooking food.",
+          "targets": ["Campfire", "Cooking Pot"],
+          "destination": "Cooking Area"
+      },
+      {
+          "name": "Planting",
+          "description": "Planting crops in fields.",
+          "targets": ["Field"],
+          "destination": "Farm"
+      },
+      {
+          "name": "Watering",
+          "description": "Watering plants for growth.",
+          "targets": ["Field"],
+          "destination": "Farm"
+      },
+      {
+          "name": "Gathering",
+          "description": "Collecting natural resources.",
+          "targets": ["Herbs", "Berries"],
+          "destination": "Storage"
+      }
+  ]
+}

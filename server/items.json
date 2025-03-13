@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Stone",
+        "category": "Material",
+        "class": "Common",
+        "weight": 3,
+        "description": "Used as a building or crafting material. Can be obtained by mining stone."
+    },
+    {
+        "name": "Wood",
+        "category": "Material",
+        "class": "Common",
+        "weight": 3,
+        "description": "Used as a building or crafting material. Mainly obtained by lumbering trees."
+    },
+    {
+        "name": "Metal Ore",
+        "category": "Material",
+        "class": "Common",
+        "weight": 8,
+        "description": "Can be smelted into ingots in a furnace. Found in caves. Some Pals can detect ores."
+    },
+    {
+        "name": "Palgeum Fragment",
+        "category": "Material",
+        "class": "Common",
+        "weight": 1,
+        "description": "A crystallized object containing the energy of the World Tree. Used to craft special items or buildings."
+    },
+    {
+        "name": "Gunpowder",
+        "category": "Material",
+        "class": "Common",
+        "weight": 0.2,
+        "description": "Gunpowder used for firing bullets. Required for making ammunition."
+    }
+]

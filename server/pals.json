@@ -1,0 +1,111 @@
+[
+    {
+        "id": 1,
+        "name": "Lamball",
+        "work_traits": {
+            "Handwork": 1,
+            "Transporting": 1,
+            "Ranching": 1
+        },
+        "partner_skill": "Fluffy Shield - Turns into a shield that attaches to the player. Can be placed on a ranch to produce wool.",
+        "partner_item": null,
+        "attributes": [
+            "None"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Wool"
+        ],
+        "production_items": [
+            "Wool"
+        ],
+        "description": "It rolls down hills by itself. Once dizzy, it becomes easy prey at the bottom of the food chain."
+    },
+    {
+        "id": 103,
+        "name": "Elecpanda",
+        "work_traits": {
+            "Generating Electricity": 3,
+            "Handwork": 2,
+            "Lumbering": 2,
+            "Transporting": 3
+        },
+        "partner_skill": "Yellow Juggernaut - Allows the player to ride. Can use a minigun while mounted.",
+        "partner_item": "Elecpanda's Minigun",
+        "attributes": [
+            "Electric"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Generator Core",
+            "Leather"
+        ],
+        "production_items": [],
+        "description": "It has a friendly face and a sturdy body, but it goes berserk when given a minigun."
+    },
+    {
+        "id": 10,
+        "name": "Pengullet",
+        "work_traits": {
+            "Watering": 1,
+            "Handwork": 1,
+            "Cooling": 1,
+            "Transporting": 1
+        },
+        "partner_skill": "Pengki Launcher - Attaches a rocket launcher that fires Pengki as a projectile. Explodes on impact, leaving Pengki incapacitated.",
+        "partner_item": "Pengki's Rocket Launcher",
+        "attributes": [
+            "Water",
+            "Ice"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Frozen Core",
+            "Pal Fluid"
+        ],
+        "production_items": [],
+        "description": "Its wings have completely degenerated, making it unable to fly. However, its DNA still holds a longing for the sky, and it constantly tries to take flight."
+    },
+    {
+        "id": 4,
+        "name": "Kurulis",
+        "work_traits": {
+            "Planting": 1,
+            "Handwork": 1,
+            "Gathering": 1,
+            "Lumbering": 1,
+            "Medicine Production": 1
+        },
+        "partner_skill": "Kurulis Recoil - Perches on the player's head and provides suppressive fire with a submachine gun in response to attacks.",
+        "partner_item": "Kurulis' Submachine Gun",
+        "attributes": [
+            "Grass"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Berry Seed",
+            "Low-grade Medicine"
+        ],
+        "production_items": [],
+        "description": "Has an intelligence equivalent to a 5-7 year old child. Some individuals have learned how to use firearms and are recorded to have killed their owners."
+    },
+    {
+        "id": 5,
+        "name": "Paiho",
+        "work_traits": {
+            "Kindling": 1
+        },
+        "partner_skill": "Hug Fire - Turns into a flamethrower that attaches to the player.",
+        "partner_item": "Paiho's Saddle",
+        "attributes": [
+            "Fire"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Leather",
+            "Ignition Core"
+        ],
+        "production_items": [],
+        "description": "When first born, it struggles to control its fire and frequently emits flames, sometimes choking itself. Its sneezes can cause forest fires."
+    }
+]
