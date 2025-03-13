@@ -4,32 +4,28 @@ import tempfile
 import os
 import uuid
 import shutil
-from google.cloud import speech
+# from google.cloud import speech
 from openai import OpenAI
 from dotenv import load_dotenv
 from module import transcribe_audio, generate_unreal_code
 
 app = FastAPI()
-# dotenv_path = "C:/Jeonghwan/Gamejam/VoiceCommand/ProjVoiceCommand/.env"
-# load_dotenv()
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Google Cloud Speech-to-Text 설정
-# client = speech.SpeechClient()
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# 저장할 디렉토리 설정
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+@app.post("/convert-audio")
+async def convert_audio(file: UploadFile = File(...)):
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+            tmp.write(await file.read())
+            tmp_path = tmp.name
+        text = transcribe_audio(tmp_path)
+        os.remove(tmp_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/upload-audio/")
-async def upload_audio(file: UploadFile = File(...)):
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
-
-    # 업로드된 파일을 서버에 저장
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return {"filename": file.filename, "file_path": file_path}
+    return text
 
 
 
