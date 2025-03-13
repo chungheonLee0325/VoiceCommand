@@ -55,6 +55,24 @@ enum class EWeaponType : uint8
 	ShotGun UMETA(DisplayName = "ShotGun"),
 };
 
+// 체력Bar, 공격 및 피격 판정 확인 등 다양한 상황에서 사용
+UENUM(BlueprintType)
+enum class EWorkTrait : uint8
+{
+	None UMETA(DisplayName = "None"),
+
+	Lumbering UMETA(DisplayName = "Lumbering"),
+	Mining UMETA(DisplayName = "Mining"),
+	Transporting UMETA(DisplayName = "Transporting"),
+	Handwork UMETA(DisplayName = "Handwork"),
+	
+	Kindling UMETA(DisplayName = "Kindling"),
+	Planting UMETA(DisplayName = "Planting"),
+	Watering UMETA(DisplayName = "Watering"),
+	Gathering UMETA(DisplayName = "Gathering"),
+};
+
+
 // 스탯 유형 정의
 UENUM(BlueprintType)
 enum class EAreaObjectStatType : uint8
