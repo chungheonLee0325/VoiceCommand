@@ -79,7 +79,7 @@ void ULumbering::MoveToLumber()
 		{
 			FAIMoveRequest MoveRequest;
 			MoveRequest.SetGoalActor(Target);
-			MoveRequest.SetAcceptanceRadius(20.0f);
+			MoveRequest.SetAcceptanceRadius(300.0f);
 
 			FNavPathSharedPtr NavPath;
 
@@ -97,7 +97,7 @@ void ULumbering::MoveToLumber()
 		//FLog::Log("dist",	FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()));
 
 
-		if (FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()) <= 200.0f)
+		if (FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()) <= 300.0f)
 		{
 			MonsterState = 1;
 			bIsMoving = false;
@@ -126,6 +126,8 @@ void ULumbering::Lumbering(float dt)
 			MonsterState = 2;
 			bIsLumbering = false;
 			ActionTime = 0.f;
+
+			// 바닥에 자원있으면 머리에 올리자
 		}
 	}
 }
