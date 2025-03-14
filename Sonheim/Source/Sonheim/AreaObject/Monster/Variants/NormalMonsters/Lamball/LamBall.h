@@ -30,5 +30,5 @@ public:
 	
 	virtual void SetAggroTarget(AAreaObject* NewTarget) { m_AggroTarget = NewTarget; }
 
-
+	
 };

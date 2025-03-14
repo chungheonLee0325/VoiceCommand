@@ -70,6 +70,14 @@ ABaseMonster::ABaseMonster()
 	{
 		HPWidgetComponent->SetWidgetClass(monsterHPWidget.Class);
 	}
+	
+	PickaxeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickaxeMesh"));
+	
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PickaxeMeshObject
+		(TEXT("/Script/Engine.StaticMesh'/Game/SurvivalGameKitV2/Meshes/Static/SM_Pickaxe_01.SM_Pickaxe_01'"));
+	if (PickaxeMeshObject.Succeeded()) {
+		PickaxeMesh->SetStaticMesh(PickaxeMeshObject.Object);
+	}
 }
 
 UBaseSkillRoulette* ABaseMonster::GetSkillRoulette() const
@@ -171,6 +179,9 @@ void ABaseMonster::BeginPlay()
 		LOG_PRINT(TEXT("FSM is nullptr"));
 		LOG_SCREEN("FSM is nullptr. please set in construct");
 	}
+
+	PickaxeMesh->SetVisibility(false);
+
 }
 
 // Called every frame
