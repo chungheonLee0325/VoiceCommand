@@ -167,7 +167,7 @@ void ASonheimPlayer::SendWavFileAsJson()
 
 	FString JsonString = FString::Printf(TEXT("{\"audio\":\"%s\"}"), *Base64EncodedData);
 	// Base64 인코딩된 데이터를 JSON 문자열로 변환 (키: audio)
-
+	
 	SendJsonData(JsonString);
 	// JSON 데이터를 서버로 전송
 }
