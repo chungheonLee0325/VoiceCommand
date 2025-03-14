@@ -382,7 +382,7 @@ UBaseSkill* AAreaObject::GetCurrentSkill()
 	{
 		if (m_CurrentSkill != nullptr)
 		{
-			LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
+			//LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
 		}
 		m_CurrentSkill = nullptr;
 		return nullptr;
@@ -394,7 +394,7 @@ FAttackData* AAreaObject::GetCurrentSkillAttackData(int Index)
 {
 	if (false == IsValid(m_CurrentSkill))
 	{
-		LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
+		//LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
 		m_CurrentSkill = nullptr;
 		return nullptr;
 	}
@@ -405,7 +405,7 @@ void AAreaObject::UpdateCurrentSkill(UBaseSkill* NewSkill)
 {
 	if (!IsValid(NewSkill))
 	{
-		LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
+		//LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
 		return;
 	}
 
@@ -418,7 +418,7 @@ UBaseSkill* AAreaObject::GetSkillByID(int SkillID)
 
 	if (!IsValid(*skillPointer))
 	{
-		LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
+		//LOG_PRINT(TEXT("스킬 댕글링 포인터 문제발생!!!!"));
 		return nullptr;
 	}
 	return *skillPointer;
@@ -428,12 +428,12 @@ bool AAreaObject::CanCastSkill(UBaseSkill* Skill, AAreaObject* Target)
 {
 	if (nullptr != m_CurrentSkill)
 	{
-		LOG_PRINT(TEXT("현재 스킬 사용중. m_CurrentSkill 초기화 후 사용"));
+		//LOG_PRINT(TEXT("현재 스킬 사용중. m_CurrentSkill 초기화 후 사용"));
 		return false;
 	}
 
-	if (Skill == nullptr) LOG_PRINT(TEXT("Skill is Empty"));
-	if (Target == nullptr) LOG_PRINT(TEXT("Target is Empty"));
+	//if (Skill == nullptr) //LOG_PRINT(TEXT("Skill is Empty"));
+	//if (Target == nullptr) //LOG_PRINT(TEXT("Target is Empty"));
 
 	return Skill && Skill->CanCast(this, Target);
 }
@@ -454,7 +454,7 @@ bool AAreaObject::CastSkill(UBaseSkill* Skill, AAreaObject* Target)
 	else
 	{
 		FString fail = UEnum::GetValueAsString(Skill->SkillFailCase);
-		LOG_PRINT(TEXT("CastSkill Failed: %s"), *fail);
+		//LOG_PRINT(TEXT("CastSkill Failed: %s"), *fail);
 		//LOG_SCREEN_ERROR(this, "CastSkill Failed");
 		return false;
 	}

@@ -15,7 +15,8 @@
 #include "Sonheim/Utilities/LogMacro.h"
 
 void ULumbering::InitState()
-{}
+{
+}
 
 void ULumbering::CheckIsValid()
 {
@@ -28,28 +29,31 @@ void ULumbering::CheckIsValid()
 void ULumbering::Enter()
 {
 	FLog::Log("ULumbering::Enter");
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseResourceObject::StaticClass(),TargetArr);
-
-	// 나중에 동적으로 받으면 지우기
-	m_Owner->GotResource = 5;
-	
-	for (auto FindTarget : TargetArr)
-	{
-		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
-		
-		if (BaseResourceTarget->m_ResourceObjectID == m_Owner->GotResource)
-		{
-			Target = BaseResourceTarget;
-		}
-	}
-
 	LumberingTime = FMath::RandRange(2.8f, 4.f);
+
+	if (m_Owner->GetResourceTarget() != nullptr)
+	{
+		Target = m_Owner->GetResourceTarget();
+		return;
+	}
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseResourceObject::StaticClass(),TargetArr);
+	//
+	//	// 나중에 동적으로 받으면 지우기
+	//	m_Owner->GotResource = 5;
+	//	
+	//	for (auto FindTarget : TargetArr)
+	//	{
+	//		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
+	//		
+	//		if (BaseResourceTarget->m_ResourceObjectID == m_Owner->GotResource)
+	//		{
+	//			Target = BaseResourceTarget;
+	//		}
+	//	}
 }
 
 void ULumbering::Execute(float dt)
 {
-
 	if (!Target)
 	{
 		ChangeState(m_NextState);
@@ -82,7 +86,20 @@ void ULumbering::Execute(float dt)
 }
 
 void ULumbering::Exit()
-{}
+{
+	for (int i{}; i < HaveItemArr.Num(); ++i)
+	{
+		HaveItemArr[i]->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		HaveItemArr[i]->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+		HaveItemArr[i]->CollectionSphere->SetSimulatePhysics(true);
+		HaveItemArr[i]->bStored = true;
+	}
+	HaveItemArr.Empty();
+	
+	bIsLumbering = false;
+	m_Owner->PickaxeMesh->SetVisibility(false);
+	MonsterState = 0;
+}
 
 int32 ULumbering::CheckState()
 {
@@ -91,11 +108,10 @@ int32 ULumbering::CheckState()
 
 void ULumbering::MoveToLumber()
 {
-
 	if (bIsMoving)
 	{
 		//FLog::Log("MoveToLumber");
-		
+
 		if (m_Owner->AIController)
 		{
 			FAIMoveRequest MoveRequest;
@@ -105,7 +121,7 @@ void ULumbering::MoveToLumber()
 			FNavPathSharedPtr NavPath;
 
 			m_Owner->AIController->MoveTo(MoveRequest, &NavPath);
-	
+
 			// // Debug line
 			// auto PathPoints = NavPath->GetPathPoints();
 			// for (auto Point : PathPoints)
@@ -146,21 +162,23 @@ void ULumbering::Lumbering(float dt)
 		if (ActionTime > LumberingTime)
 		{
 			// 바닥에 자원있으면 머리에 올리자
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(),ItemArr);
-			
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(), ItemArr);
+
 			int32 i{1};
 			for (auto FindItem : ItemArr)
 			{
 				auto BaseItemTarget = Cast<ABaseItem>(FindItem);
-		
-				if (BaseItemTarget->m_ItemID == m_Owner->GotResource  && !BaseItemTarget->GetOwner() && !BaseItemTarget->bStored)
+
+				if (BaseItemTarget->m_ItemID == m_Owner->GotResource && !BaseItemTarget->GetOwner() && !BaseItemTarget->
+					bStored)
 				{
 					if (i == 1)
 					{
 						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
 						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket1");
-						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->
+						                                                   GetSocketByName("ResourceSocket1");
+						WeaponSocket->AttachActor(BaseItemTarget, m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
 
@@ -171,27 +189,27 @@ void ULumbering::Lumbering(float dt)
 					{
 						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
 						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket2");
-						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->
+						                                                   GetSocketByName("ResourceSocket2");
+						WeaponSocket->AttachActor(BaseItemTarget, m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
-
 					}
 					if (i == 3)
 					{
 						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
 						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket3");
-						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->
+						                                                   GetSocketByName("ResourceSocket3");
+						WeaponSocket->AttachActor(BaseItemTarget, m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
-
 					}
-					
+
 					++i;
 				}
 			}
-			
+
 			m_Owner->GetAttachedActors(AttachedActors);
 			for (auto Attached : AttachedActors)
 			{
@@ -273,5 +291,6 @@ void ULumbering::StoreLumber(float dt)
 			HaveItemArr[i]->CollectionSphere->SetSimulatePhysics(true);
 			HaveItemArr[i]->bStored = true;
 		}
+		HaveItemArr.Empty();
 	}
 }

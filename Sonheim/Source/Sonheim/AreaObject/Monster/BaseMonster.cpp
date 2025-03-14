@@ -11,10 +11,13 @@
 #include "AIController.h"
 #include "BaseSkillRoulette.h"
 #include "AI/Base/BaseAIController.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Sonheim/AreaObject/Attribute/StaminaComponent.h"
 #include "Sonheim/AreaObject/Player/SonheimPlayer.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
 #include "Sonheim/GameManager/SonheimGameInstance.h"
+#include "Sonheim/GameObject/ResourceObject/BaseResourceObject.h"
 #include "Sonheim/UI/Widget/BaseStatusWidget.h"
 #include "Sonheim/UI/Widget/Monster/MonsterStatusWidget.h"
 
@@ -68,14 +71,17 @@ ABaseMonster::ABaseMonster()
 	{
 		HPWidgetComponent->SetWidgetClass(monsterHPWidget.Class);
 	}
-	
+
 	PickaxeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickaxeMesh"));
-	
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PickaxeMeshObject
 		(TEXT("/Script/Engine.StaticMesh'/Game/SurvivalGameKitV2/Meshes/Static/SM_Pickaxe_01.SM_Pickaxe_01'"));
-	if (PickaxeMeshObject.Succeeded()) {
+	if (PickaxeMeshObject.Succeeded())
+	{
 		PickaxeMesh->SetStaticMesh(PickaxeMeshObject.Object);
 	}
+
+	HeadVFXPoint = CreateDefaultSubobject<USceneComponent>(TEXT("HeadVFXPoint"));
 }
 
 UBaseSkillRoulette* ABaseMonster::GetSkillRoulette() const
@@ -130,9 +136,12 @@ UBaseSkillRoulette* ABaseMonster::CreateSkillRoulette()
 void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	WalkSpeed = dt_AreaObject->WalkSpeed;
+	ForcedWalkSpeed = WalkSpeed * 5.f;
+
 	AIController = Cast<AAIController>(GetController());
-	
+
 	// HP UI 위치, Visible Setting
 	if (dt_AreaObject->EnemyType != EEnemyType::Boss)
 	{
@@ -176,7 +185,6 @@ void ABaseMonster::BeginPlay()
 	}
 
 	PickaxeMesh->SetVisibility(false);
-
 }
 
 // Called every frame
@@ -289,6 +297,7 @@ void ABaseMonster::InitializeHUD()
 
 void ABaseMonster::Surprise()
 {
+	if (bIsForced) return;
 	bIsSurprise = true;
 	// Ouch Face
 	ChangeFace(2);
@@ -296,6 +305,7 @@ void ABaseMonster::Surprise()
 
 void ABaseMonster::CalmDown()
 {
+	if (bIsForced) return;
 	bIsSurprise = false;
 	// Smile Face
 	ChangeFace(0);
@@ -309,6 +319,83 @@ void ABaseMonster::StartTransport()
 void ABaseMonster::EndTransport()
 {
 	bIsTransporting = false;
+}
+
+void ABaseMonster::AIVoiceCommand(int ResourceID, bool IsForced)
+{
+	ABaseResourceObject* Target = nullptr;
+	// Tree
+	if (ResourceID == 1 || ResourceID == 5 || ResourceID == 10)
+	{
+		Target = GetNearResourceObject(ResourceID);
+	}
+	else
+	{
+		FLog::Log("Wrong ResourceID");
+		return;
+	}
+	SetIsForced(IsForced);
+	m_AiFSM->StopFSM();
+	m_AiFSM->ChangeState(EAiStateType::SelectAction);
+}
+
+void ABaseMonster::SetIsForced(bool IsForced)
+{
+	if (IsForced == true)
+	{
+		ChangeFace(3);
+		GetCharacterMovement()->MaxWalkSpeed = ForcedWalkSpeed;
+		this->bIsForced = IsForced;
+		VFXSpwan(1);
+		VFXSpwan(2);
+		VFXSpwan(3);
+	}
+	else
+	{
+		ChangeFace(0);
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		this->bIsForced = IsForced;
+	}
+}
+
+void ABaseMonster::VFXSpwan(int VFXID)
+{
+	FVector VFXLocation = GetActorLocation() + FVector::UpVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	if (VFXID == 0)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Exe, VFXLocation);
+	}
+	else if (VFXID == 1)
+	{
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Question, VFXLocation);
+	}
+	else if (VFXID == 2)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Sweet, VFXLocation);
+	}
+}
+
+class ABaseResourceObject* ABaseMonster::GetNearResourceObject(int ResourceID)
+{
+	TArray<AActor*> TargetArr;
+	ABaseResourceObject* Target = nullptr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseResourceObject::StaticClass(), TargetArr);
+
+	// 나중에 동적으로 받으면 지우기
+	// GotResource = 5;
+
+	for (auto FindTarget : TargetArr)
+	{
+		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
+
+		if (BaseResourceTarget->m_ResourceObjectID == ResourceID)
+		{
+			Target = BaseResourceTarget;
+			SetResourceTarget(Target);
+			GotResource = ResourceID;
+		}
+	}
+	return Target;
 }
 
 void ABaseMonster::RemoveSkillEntryByID(const int id)

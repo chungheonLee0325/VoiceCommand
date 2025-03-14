@@ -5,12 +5,15 @@
 #include "CoreMinimal.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Base/AreaObject.h"
+#include "Sonheim/AreaObject/Monster/Variants/NormalMonsters/Lamball/LamBall.h"
+#include "TimerManager.h"
 #include "SonheimPlayer.generated.h"
 
 class ASonheimPlayerState;
 class ULockOnComponent;
 class ASonheimPlayerController;
 class ABaseItem;
+
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -67,9 +70,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Audio")
-	void SendWavFileAsJson();
+	// WAV 파일을 로드하고 바이너리 데이터로 전환
+	void LoadWavFileBinary(const FString& FilePath, TArray<uint8>& BinaryData);
 
+	// WAV 파일을 multipart/form-data 형식으로 전송
+	void SendWavFileAsFormData(const TArray<uint8>& BinaryData);
+
+	// WAV 파일을 직접 전송하는 함수
+	void SendWavFileDirectly();
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -120,7 +129,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
 	void RespawnAtCheckpoint();
 
+	UFUNCTION(BlueprintCallable)
+	void HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder);
+
+	UFUNCTION(BlueprintCallable)
+	void VFXSpawnLevelUP();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_LevelUP;
+
 	void Reward(int ItemID, int ItemValue) const;
+	
 
 	//// 장비 시각화 관련 함수 추가
 	//UFUNCTION(BlueprintCallable, Category = "Equipment")
@@ -247,11 +266,8 @@ private:
 	// 마지막 체크포인트 회전
 	UPROPERTY(VisibleAnywhere, Category = "Checkpoint")
 	FRotator LastCheckpointRotation = FRotator::ZeroRotator;
-
 	
-	private : 
+private:
+	TArray<uint8> FStringToUint8(FString str);
 
-	void LoadWavFile(const FString& FilePath, TArray<uint8>& BinaryData); // WAV 파일을 로드하는 함수 선언
-	void EncodeToBase64(const TArray<uint8>& BinaryData, FString& Base64EncodedData); // WAV 데이터를 Base64로 인코딩하는 함수 선언
-	void SendJsonData(const FString& JsonString); // JSON 데이터를 서버로 전송하는 함수 선언
 };
