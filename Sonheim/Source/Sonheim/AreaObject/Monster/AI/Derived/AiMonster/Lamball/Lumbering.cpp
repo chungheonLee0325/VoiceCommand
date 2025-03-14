@@ -4,10 +4,13 @@
 #include "Lumbering.h"
 
 #include "AITypes.h"
+#include "Components/SphereComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Sonheim/AreaObject/Monster/BaseMonster.h"
 #include "Sonheim/AreaObject/Monster/AI/Base/BaseAIController.h"
+#include "Sonheim/GameObject/Items/BaseItem.h"
 #include "Sonheim/GameObject/ResourceObject/BaseResourceObject.h"
 #include "Sonheim/Utilities/LogMacro.h"
 
@@ -26,7 +29,20 @@ void ULumbering::Enter()
 {
 	FLog::Log("ULumbering::Enter");
 
-	Target = UGameplayStatics::GetActorOfClass(GetWorld(), ABaseResourceObject::StaticClass());
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseResourceObject::StaticClass(),TargetArr);
+
+	// 나중에 동적으로 받으면 지우기
+	m_Owner->GotResource = 5;
+	
+	for (auto FindTarget : TargetArr)
+	{
+		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
+		
+		if (BaseResourceTarget->m_ResourceObjectID == m_Owner->GotResource)
+		{
+			Target = BaseResourceTarget;
+		}
+	}
 }
 
 void ULumbering::Execute(float dt)
@@ -37,7 +53,9 @@ void ULumbering::Execute(float dt)
 		ChangeState(m_NextState);
 		return;
 	}
-	
+
+	//FLog::Log("State", MonsterState);
+
 	switch (CheckState())
 	{
 	case 0:
@@ -71,10 +89,11 @@ int32 ULumbering::CheckState()
 
 void ULumbering::MoveToLumber()
 {
+
 	if (bIsMoving)
 	{
 		//FLog::Log("MoveToLumber");
-
+		
 		if (m_Owner->AIController)
 		{
 			FAIMoveRequest MoveRequest;
@@ -84,7 +103,7 @@ void ULumbering::MoveToLumber()
 			FNavPathSharedPtr NavPath;
 
 			m_Owner->AIController->MoveTo(MoveRequest, &NavPath);
-
+	
 			// // Debug line
 			// auto PathPoints = NavPath->GetPathPoints();
 			// for (auto Point : PathPoints)
@@ -94,10 +113,10 @@ void ULumbering::MoveToLumber()
 			// 	UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 5.f, 1.5f);
 			// }
 		}
-		//FLog::Log("dist",	FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()));
+		FLog::Log("dist",	FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()));
 
 
-		if (FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()) <= 300.0f)
+		if (FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()) <= 400.0f)
 		{
 			MonsterState = 1;
 			bIsMoving = false;
@@ -126,8 +145,51 @@ void ULumbering::Lumbering(float dt)
 			MonsterState = 2;
 			bIsLumbering = false;
 			ActionTime = 0.f;
-
+			
 			// 바닥에 자원있으면 머리에 올리자
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(),ItemArr);
+
+			int32 i{1};
+			for (auto FindItem : ItemArr)
+			{
+				auto BaseItemTarget = Cast<ABaseItem>(FindItem);
+		
+				if (BaseItemTarget->m_ItemID == m_Owner->GotResource  && !BaseItemTarget->GetOwner() && !BaseItemTarget->bStored)
+				{
+					if (i == 1)
+					{
+						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
+						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket1");
+						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						BaseItemTarget->SetOwner(m_Owner);
+						HaveItemArr.Add(BaseItemTarget);
+
+						// 하나라도 있으면 운반 중
+						m_Owner->StartTransport();
+					}
+					if (i == 2)
+					{
+						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
+						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket2");
+						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						BaseItemTarget->SetOwner(m_Owner);
+						HaveItemArr.Add(BaseItemTarget);
+					}
+					if (i == 3)
+					{
+						BaseItemTarget->CollectionSphere->SetSimulatePhysics(false);
+						BaseItemTarget->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+						const USkeletalMeshSocket* WeaponSocket = m_Owner->GetMesh()->GetSocketByName("ResourceSocket3");
+						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
+						BaseItemTarget->SetOwner(m_Owner);
+						HaveItemArr.Add(BaseItemTarget);
+					}
+					
+					++i;
+				}
+			}
 		}
 	}
 }
@@ -137,7 +199,7 @@ void ULumbering::MoveToStore()
 {
 	if (bIsMoving)
 	{
-		FLog::Log("MoveToStore");
+		//FLog::Log("MoveToStore");
 
 		//auto Target{UGameplayStatics::GetActorOfClass(GetWorld(), ABaseResourceObject::StaticClass())};
 
@@ -167,6 +229,7 @@ void ULumbering::MoveToStore()
 			MonsterState = 3;
 			bIsMoving = false;
 			ActionTime = 0.f;
+			m_Owner->EndTransport();
 		}
 	}
 }
@@ -178,7 +241,14 @@ void ULumbering::StoreLumber(float dt)
 	if (ActionTime > StoreTime)
 	{
 		MonsterState = 0;
-		//bIsLumbering = false;
 		ActionTime = 0.f;
+
+		for (int i{}; i < HaveItemArr.Num(); ++i)
+		{
+			HaveItemArr[i]->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+			HaveItemArr[i]->CollectionSphere->SetSimulatePhysics(true);
+			HaveItemArr[i]->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			HaveItemArr[i]->bStored = true;
+		}
 	}
 }

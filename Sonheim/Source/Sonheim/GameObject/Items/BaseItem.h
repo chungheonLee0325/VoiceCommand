@@ -24,6 +24,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Data")
 	int m_ItemID = 0;
+	
+	UPROPERTY(EditAnywhere, Category = "Collection")
+	class USphereComponent* CollectionSphere;
+
+	bool bStored{false};
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,8 +42,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Collection")
 	UParticleSystem* CollectionEffect;
 
-	UPROPERTY(EditAnywhere, Category = "Collection")
-	class USphereComponent* CollectionSphere;
 
 	UPROPERTY(EditAnywhere, Category = "Collection")
 	class UStaticMeshComponent* ItemMesh;
@@ -58,4 +62,5 @@ protected:
 
 	UPROPERTY()
 	USonheimGameInstance* m_GameInstance;
+	
 };
