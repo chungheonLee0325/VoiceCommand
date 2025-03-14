@@ -11,6 +11,7 @@
 #include "http.h"
 #include "Kismet/GameplayStatics.h"
 #include "JsonObjectConverter.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Attribute/LevelComponent.h"
@@ -46,7 +47,7 @@ ASonheimPlayer::ASonheimPlayer()
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -97.f), FRotator(0, -90, 0));
 		GetMesh()->SetRelativeScale3D(FVector(0.4f));
 	}
-	
+
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
@@ -140,7 +141,7 @@ void ASonheimPlayer::OnRevival()
 void ASonheimPlayer::Reward(int ItemID, int ItemValue) const
 {
 	S_PlayerState->AddItem(ItemID, ItemValue);
-	m_LevelComponent->AddExp(10);
+	m_LevelComponent->AddExp(30);
 }
 
 // Called every frame
@@ -153,7 +154,6 @@ void ASonheimPlayer::Tick(float DeltaTime)
 	{
 		SendWavFileDirectly();
 	}
-	
 }
 
 // WAV 파일을 로드하고 바이너리 데이터로 전환
@@ -215,7 +215,7 @@ void ASonheimPlayer::SendWavFileAsFormData(const TArray<uint8>& BinaryData)
 
 	// 요청 완료 콜백 설정
 	Request->OnProcessRequestComplete().BindLambda(
-		[](FHttpRequestPtr Req, FHttpResponsePtr Res, bool bWasSuccessful)
+		[this](FHttpRequestPtr Req, FHttpResponsePtr Res, bool bWasSuccessful)
 		{
 			if (bWasSuccessful && Res.IsValid())
 			{
@@ -224,19 +224,21 @@ void ASonheimPlayer::SendWavFileAsFormData(const TArray<uint8>& BinaryData)
 
 				// ToDo : 처리
 				FJsonObjectConverter::JsonObjectStringToUStruct(string, &InfoArray);
-				
+				HandleAIVoiceOrder(InfoArray);
 				// 성공 시 로그 출력
 				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! Response: %s"), *Res->GetContentAsString());
-				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 1: %hhd"), InfoArray.actor);
-				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 2: %hhd"), InfoArray.forced);
-				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 3: %hhd"), InfoArray.target);
-				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 4: %hhd"), InfoArray.work);
-				
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%s"), *Res->GetContentAsString()));
+				LOG_SCREEN("Successfully sent WAV file! Response: %s", *Res->GetContentAsString())
+				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 1: %hhd"), InfoArray.actor);
+				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 2: %hhd"), InfoArray.forced);
+				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 3: %hhd"), InfoArray.target);
+				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 4: %hhd"), InfoArray.work);
 			}
 			else
 			{
 				// 실패 시 로그 출력
-				UE_LOG(LogTemp, Error, TEXT("Failed to send WAV file. Response Code: %d"), Res.IsValid() ? Res->GetResponseCode() : -1);
+				UE_LOG(LogTemp, Error, TEXT("Failed to send WAV file. Response Code: %d"),
+				       Res.IsValid() ? Res->GetResponseCode() : -1);
 			}
 		});
 
@@ -248,8 +250,10 @@ void ASonheimPlayer::SendWavFileDirectly()
 {
 	// Wav 파일 전송 로직
 	UE_LOG(LogTemp, Log, TEXT("Wav 파일 전송 시작!"));
-	
-	FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
+
+	FString FilePath = TEXT("D:/UE/TeamProject_AI/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	//FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	//FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
 	TArray<uint8> BinaryData;
 	LoadWavFileBinary(FilePath, BinaryData);
 
@@ -313,7 +317,6 @@ bool ASonheimPlayer::CanPerformAction(EPlayerState State, FString ActionName)
 
 	return false;
 }
-
 
 
 void ASonheimPlayer::SetComboState(bool bCanCombo, int SkillID)
@@ -477,25 +480,58 @@ void ASonheimPlayer::RespawnAtCheckpoint()
 	SetPlayerState(EPlayerState::NORMAL);
 }
 
-ALamBall* ASonheimPlayer::GetNearResourceObject()
+void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 {
-	TArray<AActor*> TargetArr;
-	ALamBall* Target = nullptr;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
-
-	// 나중에 동적으로 받으면 지우기
-	// GotResource = 5;
-
-	for (auto FindTarget : TargetArr)
+	int itemID = 0;
+	if (AIVoiceOrder.target == EAIVoiceTarget::Ore)
 	{
-		auto lamball = Cast<ALamBall>(FindTarget);
+		itemID = 10;
+	}
+	else if (AIVoiceOrder.target == EAIVoiceTarget::Tree)
+	{
+		itemID = 1;
+	}
+	else
+	{
+		itemID = 5;
+	}
+	
+	if (AIVoiceOrder.actor == EAIVoiceActor::Everyone)
+	{
+		TArray<AActor*> TargetArr;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
 
-		//if ()
+		// 나중에 동적으로 받으면 지우기
+		// GotResource = 5;
+
+		for (auto FindTarget : TargetArr)
 		{
-			Target = lamball;
-			
-			
+			auto lamball = Cast<ALamBall>(FindTarget);
+
+			lamball->AIVoiceCommand(itemID, AIVoiceOrder.forced);
 		}
 	}
-	return Target;
+	else
+	{
+		TArray<AActor*> TargetArr;
+		ALamBall* Target = nullptr;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
+
+		// 나중에 동적으로 받으면 지우기
+		// GotResource = 5;
+
+		for (auto FindTarget : TargetArr)
+		{
+			auto lamball = Cast<ALamBall>(FindTarget);
+
+			lamball->AIVoiceCommand(itemID, AIVoiceOrder.forced);
+			return;
+		}
+	}
+}
+
+void ASonheimPlayer::VFXSpawnLevelUP()
+{
+	FVector VFXLocation = GetActorLocation() + FVector::UpVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_LevelUP, VFXLocation);
 }

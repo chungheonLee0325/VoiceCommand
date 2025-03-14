@@ -155,8 +155,8 @@ public:
 	class ABaseResourceObject* GetNearResourceObject(int ResourceID);
 
 	void SetIsForced(bool IsForced);
-	void VFXSpwan(int VFXID);
 	bool bIsForced = false;
+	void VFXSpwan(int VFXID);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* VFX_Exe;

@@ -78,10 +78,7 @@ public:
 
 	// WAV 파일을 직접 전송하는 함수
 	void SendWavFileDirectly();
-
-
-
-
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -131,7 +128,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
 	void RespawnAtCheckpoint();
-	ALamBall* GetNearResourceObject();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder);
+
+	UFUNCTION(BlueprintCallable)
+	void VFXSpawnLevelUP();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_LevelUP;
 
 	void Reward(int ItemID, int ItemValue) const;
 	
