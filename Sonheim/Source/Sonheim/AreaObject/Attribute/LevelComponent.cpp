@@ -1,6 +1,8 @@
 #include "LevelComponent.h"
 //#include "StatBonusComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Sonheim/AreaObject/Base/AreaObject.h"
+#include "Sonheim/AreaObject/Player/SonheimPlayer.h"
 #include "Sonheim/GameManager/SonheimGameInstance.h"
 #include "Sonheim/Utilities/LogMacro.h"
 
@@ -158,7 +160,16 @@ void ULevelComponent::HandleLevelUp()
 
 	// 레벨업 델리게이트 호출
 	OnLevelChanged.Broadcast(OldLevel, CurrentLevel, true);
-	FLog::Log("Current Level is ", CurrentLevel);
+	ASonheimPlayer* player = Cast<ASonheimPlayer>(m_Owner);
+	if (player != nullptr)
+	{
+		player->VFXSpawnLevelUP();
+		if (CurrentLevel == 3)
+		{
+			UGameplayStatics::OpenLevel(this, "GameEndMap");
+		}
+	}
+	//FLog::Log("Current Level is ", CurrentLevel);
 }
 
 void ULevelComponent::ApplyLevelUpBonuses(int32 OldLevel, int32 NewLevel)

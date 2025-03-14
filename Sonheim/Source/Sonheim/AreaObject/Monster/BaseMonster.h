@@ -7,6 +7,8 @@
 #include "Sonheim/Utilities/LogMacro.h"
 #include "BaseMonster.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraEmitter;
 class UWidgetComponent;
 class USkillBag;
 class UBaseAiFSM;
@@ -154,6 +156,19 @@ public:
 
 	void SetIsForced(bool IsForced);
 	bool bIsForced = false;
+	void VFXSpwan(int VFXID);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_Exe;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_Question;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_Sweet;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USceneComponent* HeadVFXPoint;
 	
 	// Skill
 	void RemoveSkillEntryByID(const int id);

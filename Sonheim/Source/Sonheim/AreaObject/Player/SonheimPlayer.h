@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Base/AreaObject.h"
+#include "Sonheim/AreaObject/Monster/Variants/NormalMonsters/Lamball/LamBall.h"
 #include "TimerManager.h"
 #include "SonheimPlayer.generated.h"
 
@@ -77,10 +78,7 @@ public:
 
 	// WAV 파일을 직접 전송하는 함수
 	void SendWavFileDirectly();
-
-
-
-
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -130,6 +128,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
 	void RespawnAtCheckpoint();
+
+	UFUNCTION(BlueprintCallable)
+	void HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder);
+
+	UFUNCTION(BlueprintCallable)
+	void VFXSpawnLevelUP();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* VFX_LevelUP;
 
 	void Reward(int ItemID, int ItemValue) const;
 	
