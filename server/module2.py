@@ -33,12 +33,17 @@ def setup_llm_chain(pals_names, tasks_names, items_names):
     prompt_template = PromptTemplate(
         input_variables=["user_input"],
         template="""
-        You are an AI assistant that extracts structured game commands from natural language input.
-        Given the user's command, determine the correct values for:
-        - 'actor' (the Pal's name from the list: {pals})
-        - 'work' (the appropriate task from the list: {tasks})
-        - 'target' (the item/resource being acted upon from the list: {items})
-
+        You are an AI assistant that extracts structured game commands from natural language input. \n
+        Given the user's command, determine the correct values for: \n
+        - 'actor' (the Pal's name from the list: {pals}) \n
+        - 'work' (the appropriate task from the list: {tasks}) \n
+        - 'target' (the item/resource being acted upon from the list: {items}) \n
+        - 'forced' : If it contains words that require urgency, such as 'quickly' or 'urgently', please use forced=True. Otherwise, please use False. \n
+        - Please treat words similar to Dororong or Dororong as Lamball. \n
+        - Please treat words similar to Pengki or Pengki as Pengullet. \n
+        - Please replace metal words such as copper and iron with Ore. \n
+        - the user's command will be Korean \n
+        
         ### Example
         User: "도로롱 돌을 캐줘"
         Output:
@@ -55,7 +60,7 @@ def setup_llm_chain(pals_names, tasks_names, items_names):
         """
     )
     
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0)
     return LLMChain(llm=llm, prompt=prompt_template)
 
 def extract_command(user_input, llm_chain, pals_names, tasks_names, items_names):

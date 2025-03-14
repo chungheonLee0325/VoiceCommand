@@ -11,10 +11,12 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import PydanticOutputParser
 from module2 import *
+import json
+
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-#llm =llm = ChatGoogleGenerativeAI(model='gemini-1.5-pro')
+llm =llm = ChatGoogleGenerativeAI(model='gemini-1.5-pro')
 
 load_json_data()
 
@@ -32,15 +34,18 @@ async def convert_audio(file: UploadFile = File(...)):
             "출력은 항상 아래에 제시해주는 출력의 JSON형태로 출력해주세요.\n"
             "아래에 제시되는 명령어로부터 의미를 파악하여 아래의 출력의 형태에 맞게 채워주세요 \n"
             "도로롱 또는 도로롱과 비슷한 단어는 Lamball로 처리해주세요 \n"
-            "펭키 또는 펭키와와 비슷한 단어는 Pengullet로 처리해주세요 \n"
+            "'모두','전부'와 같은 단어가 포함되어 있다면 actor=Everyone으로 고정해주세요\n"
             "'빨리', '어서'와 같이 긴급함을 요하는 단어가 포함되면 forced=True로 해주세요. 없으면 False로 처리해주세요. \n"
+            "target은 ['Stone','Tree','Ore']에서 골라주세요."
             "명령어: {command}\n"
             "출력:{format}"
             )
         parser = PydanticOutputParser(pydantic_object = JSONparser)
         prompt = prompt.partial(format=parser.get_format_instructions())
         chain = prompt | llm | parser
-        return chain.invoke(text)
+        output=chain.invoke(text)
+        print(output)
+        return output
     except:
         return {'error':"ERROR! PLEASE PRONOUNCE RIGHTLY"}
 
@@ -61,8 +66,12 @@ async def convert_audio(file: UploadFile = File(...)):
         items_names = {item["name"]: item["name"] for item in items_data}
         llm_chain = setup_llm_chain(pals_names, tasks_names, items_names)
         user_command=text
+        print(text)
         result = extract_command(user_command, llm_chain, pals_names, tasks_names, items_names)
-        return json.dumps(result, indent=4, ensure_ascii=False)
+        output = json.dumps(result, indent=4, ensure_ascii=False)
+        if type(output)==str:
+            output=json.loads(output)
+        return output
     except:
         return {'error':"ERROR! PLEASE PRONOUNCE RIGHTLY"}
     
