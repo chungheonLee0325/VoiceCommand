@@ -31,13 +31,13 @@ public:
 
 	UFUNCTION()
 	UBaseSkillRoulette* GetSkillRoulette() const;
-	
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	UWidgetComponent* HPWidgetComponent;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	class UMonsterStatusWidget* StatusWidget;
-	
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float HeightHPUI = 160.0f;
 
@@ -57,18 +57,19 @@ public:
 	// 운반 중?
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsTransporting{false};
-	
+
 	UPROPERTY()
 	FTimerHandle OnDieHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStaticMeshComponent* PickaxeMesh;
-	
+
 	virtual float DecreaseHP(float Delta) override;
 	virtual float DecreaseStamina(float Delta, bool bIsDamaged = true) override;
 	void SetHPWidgetVisibility(bool IsVisible);
 	void SetHPWidgetVisibilityByDuration(float Duration);
 	FTimerHandle HPWidgetVisibleTimer;
+
 protected:
 	// Combat System
 	UPROPERTY()
@@ -112,7 +113,7 @@ public:
 	// Combat System
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void SetAggroTarget(AAreaObject* NewTarget) { m_AggroTarget = NewTarget; }
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	float GetDistToTarget();
 
@@ -131,9 +132,13 @@ public:
 	// Resource
 	UFUNCTION(BlueprintCallable, Category = "Resource")
 	virtual ABaseResourceObject* GetResourceTarget() const;
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Resource")
-	virtual void SetResourceTarget(ABaseResourceObject* NewTarget) { m_ResourceTarget = NewTarget; }
+	virtual void SetResourceTarget(ABaseResourceObject* NewTarget)
+	{
+		m_ResourceTarget = NewTarget;
+		if (m_ResourceTarget != nullptr) { IsWorked = true; }
+	}
 
 	// 놀라기
 	void Surprise();
@@ -142,9 +147,9 @@ public:
 	// 짐 들기
 	void StartTransport();
 	void EndTransport();
-	
+
 	// 얼굴 변화
-	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ChangeFace(int32 Feel);
 
 	// AI Voice Command
@@ -157,6 +162,7 @@ public:
 	void SetIsForced(bool IsForced);
 	bool bIsForced = false;
 	void VFXSpwan(int VFXID);
+	bool IsWorked = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* VFX_Exe;
@@ -166,15 +172,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* VFX_Sweet;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* HeadVFXPoint;
-	
+
 	// Skill
 	void RemoveSkillEntryByID(const int id);
 	void AddSkillEntryByID(const int id);
-	
-	
+
+
 	/*
 	// AI Perception 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")

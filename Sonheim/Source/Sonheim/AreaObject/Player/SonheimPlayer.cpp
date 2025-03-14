@@ -227,7 +227,7 @@ void ASonheimPlayer::SendWavFileAsFormData(const TArray<uint8>& BinaryData)
 				HandleAIVoiceOrder(InfoArray);
 				// 성공 시 로그 출력
 				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! Response: %s"), *Res->GetContentAsString());
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%s"), *Res->GetContentAsString()));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%s"), *Res->GetContentAsString()));
 				LOG_SCREEN("Successfully sent WAV file! Response: %s", *Res->GetContentAsString())
 				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 1: %hhd"), InfoArray.actor);
 				//UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 2: %hhd"), InfoArray.forced);
@@ -495,7 +495,7 @@ void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 	{
 		itemID = 5;
 	}
-	
+
 	if (AIVoiceOrder.actor == EAIVoiceActor::Everyone)
 	{
 		TArray<AActor*> TargetArr;
@@ -524,6 +524,10 @@ void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 		{
 			auto lamball = Cast<ALamBall>(FindTarget);
 
+			if (lamball->IsWorked == true)
+			{
+				continue;
+			}
 			lamball->AIVoiceCommand(itemID, AIVoiceOrder.forced);
 			return;
 		}

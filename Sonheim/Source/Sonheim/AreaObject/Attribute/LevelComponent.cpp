@@ -164,7 +164,7 @@ void ULevelComponent::HandleLevelUp()
 	if (player != nullptr)
 	{
 		player->VFXSpawnLevelUP();
-		if (CurrentLevel == 3)
+		if (CurrentLevel == 10)
 		{
 			UGameplayStatics::OpenLevel(this, "GameEndMap");
 		}
