@@ -134,7 +134,7 @@ void ABaseMonster::BeginPlay()
 	Super::BeginPlay();
 
 	WalkSpeed = dt_AreaObject->WalkSpeed;
-	ForcedWalkSpeed = WalkSpeed * 3.f;
+	ForcedWalkSpeed = WalkSpeed * 5.f;
 
 	AIController = Cast<AAIController>(GetController());
 
@@ -294,6 +294,7 @@ void ABaseMonster::InitializeHUD()
 
 void ABaseMonster::Surprise()
 {
+	if (bIsForced) return;
 	bIsSurprise = true;
 	// Ouch Face
 	ChangeFace(2);
@@ -301,6 +302,7 @@ void ABaseMonster::Surprise()
 
 void ABaseMonster::CalmDown()
 {
+	if (bIsForced) return;
 	bIsSurprise = false;
 	// Smile Face
 	ChangeFace(0);
@@ -329,22 +331,24 @@ void ABaseMonster::AIVoiceCommand(int ResourceID, bool IsForced)
 		FLog::Log("Wrong ResourceID");
 		return;
 	}
-
-	m_AiFSM->ChangeState(EAiStateType::SelectAction);
 	SetIsForced(IsForced);
+	m_AiFSM->StopFSM();
+	m_AiFSM->ChangeState(EAiStateType::SelectAction);
 }
 
 void ABaseMonster::SetIsForced(bool IsForced)
 {
 	if (IsForced == true)
 	{
-		ChangeFace(2);
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		ChangeFace(3);
+		GetCharacterMovement()->MaxWalkSpeed = ForcedWalkSpeed;
+		this->bIsForced = IsForced;
 	}
 	else
 	{
 		ChangeFace(0);
-		GetCharacterMovement()->MaxWalkSpeed = ForcedWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		this->bIsForced = IsForced;
 	}
 }
 
@@ -365,6 +369,7 @@ class ABaseResourceObject* ABaseMonster::GetNearResourceObject(int ResourceID)
 		{
 			Target = BaseResourceTarget;
 			SetResourceTarget(Target);
+			GotResource = ResourceID;
 		}
 	}
 	return Target;

@@ -142,14 +142,14 @@ public:
 	void EndTransport();
 	
 	// 얼굴 변화
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
 	void ChangeFace(int32 Feel);
 
 	// AI Voice Command
 	UFUNCTION(BlueprintCallable)
 	void AIVoiceCommand(int ResourceID, bool IsForced = false);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	class ABaseResourceObject* GetNearResourceObject(int ResourceID);
 
 	void SetIsForced(bool IsForced);
