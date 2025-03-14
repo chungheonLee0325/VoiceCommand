@@ -623,6 +623,24 @@ struct FResourceObjectData : public FTableRowBase
 	UStaticMesh* ResourceMesh = nullptr;
 };
 
+USTRUCT(BlueprintType)
+struct FAIVoiceOrder
+{
+	GENERATED_BODY()
+	//"actor":"Lamball","work":"Lumbering","target":"Tree","forced":false}
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	//EAIVoiceActor actor = EAIVoiceActor::None;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	EWorkTrait work = EWorkTrait::None;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	//EAIVoiceTarget target = EAIVoiceTarget::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	bool forced = false;
+};
+
 
 // Unreal Damage 프레임워크 안에서 Attack 정보를 넘기기위한 구조체
 USTRUCT(BlueprintType)

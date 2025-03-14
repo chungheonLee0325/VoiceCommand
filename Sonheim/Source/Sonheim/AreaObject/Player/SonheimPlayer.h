@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Base/AreaObject.h"
+#include "TimerManager.h"
 #include "SonheimPlayer.generated.h"
 
 class ASonheimPlayerState;
 class ULockOnComponent;
 class ASonheimPlayerController;
 class ABaseItem;
+
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -67,8 +69,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// WAV 파일을 서버로 전송하는 함수
 	UFUNCTION(BlueprintCallable, Category = "Audio")
-	void SendWavFileAsJson();
+	void SendWavFileDirectly();
+
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -121,6 +125,7 @@ public:
 	void RespawnAtCheckpoint();
 
 	void Reward(int ItemID, int ItemValue) const;
+	
 
 	//// 장비 시각화 관련 함수 추가
 	//UFUNCTION(BlueprintCallable, Category = "Equipment")
@@ -248,10 +253,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Checkpoint")
 	FRotator LastCheckpointRotation = FRotator::ZeroRotator;
 
-	
-	private : 
+private:
+	void LoadWavFileBinary(const FString& FilePath, TArray<uint8>& BinaryData); // WAV 파일 로드
+	void SendBinaryDataToServer(const TArray<uint8>& BinaryData); // 바이너리 데이터를 서버로 전송
 
-	void LoadWavFile(const FString& FilePath, TArray<uint8>& BinaryData); // WAV 파일을 로드하는 함수 선언
-	void EncodeToBase64(const TArray<uint8>& BinaryData, FString& Base64EncodedData); // WAV 데이터를 Base64로 인코딩하는 함수 선언
-	void SendJsonData(const FString& JsonString); // JSON 데이터를 서버로 전송하는 함수 선언
+
+// private:
+// 	// 타이머 핸들
+// 	FTimerHandle TimerHandle_SendWav;
 };
