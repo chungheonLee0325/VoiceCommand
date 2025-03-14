@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Base/AreaObject.h"
+#include "Sonheim/AreaObject/Monster/Variants/NormalMonsters/Lamball/LamBall.h"
 #include "SonheimPlayer.generated.h"
 
 class ASonheimPlayerState;
@@ -119,6 +120,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Checkpoint")
 	void RespawnAtCheckpoint();
+	ALamBall* GetNearResourceObject();
 
 	void Reward(int ItemID, int ItemValue) const;
 

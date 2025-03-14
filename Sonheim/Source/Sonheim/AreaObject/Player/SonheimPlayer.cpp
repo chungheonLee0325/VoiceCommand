@@ -9,9 +9,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "http.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Attribute/LevelComponent.h"
+#include "Sonheim/AreaObject/Monster/Variants/NormalMonsters/Lamball/LamBall.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
 #include "Sonheim/AreaObject/Utility/GhostTrail.h"
 #include "Sonheim/Utilities/LogMacro.h"
@@ -437,4 +439,27 @@ void ASonheimPlayer::RespawnAtCheckpoint()
 
 	// ToDo : 리스폰 초기화
 	SetPlayerState(EPlayerState::NORMAL);
+}
+
+ALamBall* ASonheimPlayer::GetNearResourceObject()
+{
+	TArray<AActor*> TargetArr;
+	ALamBall* Target = nullptr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
+
+	// 나중에 동적으로 받으면 지우기
+	// GotResource = 5;
+
+	for (auto FindTarget : TargetArr)
+	{
+		auto lamball = Cast<ALamBall>(FindTarget);
+
+		//if ()
+		{
+			Target = lamball;
+			
+			
+		}
+	}
+	return Target;
 }

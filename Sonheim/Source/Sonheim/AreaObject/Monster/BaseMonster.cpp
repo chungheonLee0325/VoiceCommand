@@ -11,6 +11,7 @@
 #include "AIController.h"
 #include "BaseSkillRoulette.h"
 #include "AI/Base/BaseAIController.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sonheim/AreaObject/Attribute/StaminaComponent.h"
 #include "Sonheim/AreaObject/Player/SonheimPlayer.h"
@@ -70,14 +71,17 @@ ABaseMonster::ABaseMonster()
 	{
 		HPWidgetComponent->SetWidgetClass(monsterHPWidget.Class);
 	}
-	
+
 	PickaxeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickaxeMesh"));
-	
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PickaxeMeshObject
 		(TEXT("/Script/Engine.StaticMesh'/Game/SurvivalGameKitV2/Meshes/Static/SM_Pickaxe_01.SM_Pickaxe_01'"));
-	if (PickaxeMeshObject.Succeeded()) {
+	if (PickaxeMeshObject.Succeeded())
+	{
 		PickaxeMesh->SetStaticMesh(PickaxeMeshObject.Object);
 	}
+
+	HeadVFXPoint = CreateDefaultSubobject<USceneComponent>(TEXT("HeadVFXPoint"));
 }
 
 UBaseSkillRoulette* ABaseMonster::GetSkillRoulette() const
@@ -181,7 +185,6 @@ void ABaseMonster::BeginPlay()
 	}
 
 	PickaxeMesh->SetVisibility(false);
-
 }
 
 // Called every frame
@@ -343,12 +346,32 @@ void ABaseMonster::SetIsForced(bool IsForced)
 		ChangeFace(3);
 		GetCharacterMovement()->MaxWalkSpeed = ForcedWalkSpeed;
 		this->bIsForced = IsForced;
+		VFXSpwan(1);
+		VFXSpwan(2);
+		VFXSpwan(3);
 	}
 	else
 	{
 		ChangeFace(0);
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 		this->bIsForced = IsForced;
+	}
+}
+
+void ABaseMonster::VFXSpwan(int VFXID)
+{
+	FVector VFXLocation = GetActorLocation() + FVector::UpVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	if (VFXID == 0)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Exe, VFXLocation);
+	}
+	else if (VFXID == 1)
+	{
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Question, VFXLocation);
+	}
+	else if (VFXID == 2)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_Sweet, VFXLocation);
 	}
 }
 
