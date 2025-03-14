@@ -59,6 +59,9 @@ public:
 	UPROPERTY()
 	FTimerHandle OnDieHandle;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* PickaxeMesh;
+	
 	virtual float DecreaseHP(float Delta) override;
 	virtual float DecreaseStamina(float Delta, bool bIsDamaged = true) override;
 	void SetHPWidgetVisibility(bool IsVisible);
@@ -81,7 +84,7 @@ protected:
 	float SightRadius = 1500.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Sight")
 	float LoseSightRadius = 1500.f;
-	
+
 private:
 	UPROPERTY()
 	AActor* m_CurrentTarget;
@@ -145,7 +148,8 @@ public:
 	// Skill
 	void RemoveSkillEntryByID(const int id);
 	void AddSkillEntryByID(const int id);
-
+	
+	
 	/*
 	// AI Perception 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")

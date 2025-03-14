@@ -123,6 +123,7 @@ void ULumbering::MoveToLumber()
 			MonsterState = 1;
 			bIsMoving = false;
 			ActionTime = 0.f;
+			m_Owner->PickaxeMesh->SetVisibility(true);
 		}
 	}
 }
@@ -144,10 +145,6 @@ void ULumbering::Lumbering(float dt)
 		ActionTime += dt;
 		if (ActionTime > LumberingTime)
 		{
-			MonsterState = 2;
-			bIsLumbering = false;
-			ActionTime = 0.f;
-			
 			// 바닥에 자원있으면 머리에 올리자
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(),ItemArr);
 			
@@ -205,12 +202,16 @@ void ULumbering::Lumbering(float dt)
 				}
 			}
 
+			ActionTime = 0.f;
 			if (!HasItem)
 			{
-				MonsterState = 1;
-				bIsLumbering = true;
-				ActionTime = 0.f;
 				LumberingTime = FMath::RandRange(2.8f, 4.f);
+			}
+			else
+			{
+				MonsterState = 2;
+				bIsLumbering = false;
+				m_Owner->PickaxeMesh->SetVisibility(false);
 			}
 		}
 	}
