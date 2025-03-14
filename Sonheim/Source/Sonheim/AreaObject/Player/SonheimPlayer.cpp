@@ -152,7 +152,7 @@ void ASonheimPlayer::Tick(float DeltaTime)
 
 void ASonheimPlayer::SendWavFileAsJson()
 {
-	FString FilePath = FPaths::ProjectSavedDir() + TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	FString FilePath = FPaths::ProjectSavedDir() + TEXT("BouncedWavFiles/Test.wav");
 	// 저장된 WAV 파일의 경로를 지정 (Saved 폴더 내 Test.wav)
 
 	TArray<uint8> BinaryData;
@@ -245,8 +245,7 @@ void ASonheimPlayer::SendJsonData(const FString& JsonString)
 	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
 	// HTTP 요청 객체 생성
 
-	Request->SetURL(TEXT("http://192.168.20.53:8000/convert-audio"));
-	Request->SetURL(TEXT("http://192.168.20.53:72/convert-audio"));
+	Request->SetURL(TEXT("http://192.168.20.56:72/generate_Json"));
 	// 요청할 서버의 URL 설정
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! AI 분들께 아침에 받으면 넣어서 테스트 꼭 해보기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
@@ -255,7 +254,7 @@ void ASonheimPlayer::SendJsonData(const FString& JsonString)
 
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 	// 요청 헤더에 Content-Type을 application/json으로 설정
-
+	
 	Request->SetContentAsString(JsonString);
 	// 요청 본문에 JSON 문자열 추가
 
@@ -273,6 +272,8 @@ void ASonheimPlayer::SendJsonData(const FString& JsonString)
 				// 요청이 실패
 			}
 		});
+
+	Request->ProcessRequest();
 }
 
 void ASonheimPlayer::SetComboState(bool bCanCombo, int SkillID)
