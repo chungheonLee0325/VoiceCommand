@@ -43,6 +43,8 @@ void ULumbering::Enter()
 			Target = BaseResourceTarget;
 		}
 	}
+
+	LumberingTime = FMath::RandRange(2.8f, 4.f);
 }
 
 void ULumbering::Execute(float dt)
@@ -113,7 +115,7 @@ void ULumbering::MoveToLumber()
 			// 	UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 5.f, 1.5f);
 			// }
 		}
-		FLog::Log("dist",	FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()));
+		//FLog::Log("dist",	FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()));
 
 
 		if (FVector::Distance(m_Owner->GetActorLocation(), Target->GetActorLocation()) <= 400.0f)
@@ -121,6 +123,7 @@ void ULumbering::MoveToLumber()
 			MonsterState = 1;
 			bIsMoving = false;
 			ActionTime = 0.f;
+			m_Owner->PickaxeMesh->SetVisibility(true);
 		}
 	}
 }
@@ -142,13 +145,9 @@ void ULumbering::Lumbering(float dt)
 		ActionTime += dt;
 		if (ActionTime > LumberingTime)
 		{
-			MonsterState = 2;
-			bIsLumbering = false;
-			ActionTime = 0.f;
-			
 			// 바닥에 자원있으면 머리에 올리자
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseItem::StaticClass(),ItemArr);
-
+			
 			int32 i{1};
 			for (auto FindItem : ItemArr)
 			{
@@ -176,6 +175,7 @@ void ULumbering::Lumbering(float dt)
 						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
+
 					}
 					if (i == 3)
 					{
@@ -185,10 +185,33 @@ void ULumbering::Lumbering(float dt)
 						WeaponSocket->AttachActor(BaseItemTarget,m_Owner->GetMesh());
 						BaseItemTarget->SetOwner(m_Owner);
 						HaveItemArr.Add(BaseItemTarget);
+
 					}
 					
 					++i;
 				}
+			}
+			
+			m_Owner->GetAttachedActors(AttachedActors);
+			for (auto Attached : AttachedActors)
+			{
+				auto HavingItem = Cast<ABaseItem>(Attached);
+				if (HavingItem)
+				{
+					HasItem = true;
+				}
+			}
+
+			ActionTime = 0.f;
+			if (!HasItem)
+			{
+				LumberingTime = FMath::RandRange(2.8f, 4.f);
+			}
+			else
+			{
+				MonsterState = 2;
+				bIsLumbering = false;
+				m_Owner->PickaxeMesh->SetVisibility(false);
 			}
 		}
 	}
@@ -245,9 +268,9 @@ void ULumbering::StoreLumber(float dt)
 
 		for (int i{}; i < HaveItemArr.Num(); ++i)
 		{
+			HaveItemArr[i]->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			HaveItemArr[i]->CollectionSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 			HaveItemArr[i]->CollectionSphere->SetSimulatePhysics(true);
-			HaveItemArr[i]->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			HaveItemArr[i]->bStored = true;
 		}
 	}
