@@ -384,15 +384,24 @@ class ABaseResourceObject* ABaseMonster::GetNearResourceObject(int ResourceID)
 	// 나중에 동적으로 받으면 지우기
 	// GotResource = 5;
 
+	FVector OwnerLocation{GetActorLocation()};
+	float MinDistance = FLT_MAX;
+	
 	for (auto FindTarget : TargetArr)
 	{
 		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
 
 		if (BaseResourceTarget->m_ResourceObjectID == ResourceID)
 		{
-			Target = BaseResourceTarget;
-			SetResourceTarget(Target);
-			GotResource = ResourceID;
+			float Distance = FVector::Dist(OwnerLocation, BaseResourceTarget->GetActorLocation());
+			
+			if (Distance < MinDistance)
+			{
+				MinDistance = Distance;
+				Target = BaseResourceTarget;
+				SetResourceTarget(Target);
+				GotResource = ResourceID;
+			}
 		}
 	}
 	return Target;

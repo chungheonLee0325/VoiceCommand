@@ -251,9 +251,9 @@ void ASonheimPlayer::SendWavFileDirectly()
 	// Wav 파일 전송 로직
 	UE_LOG(LogTemp, Log, TEXT("Wav 파일 전송 시작!"));
 
-	FString FilePath = TEXT("D:/UE/TeamProject_AI/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	//FString FilePath = TEXT("D:/UE/TeamProject_AI/Sonheim/Saved/BouncedWavFiles/Test.wav");
 	//FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
-	//FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	FString FilePath = TEXT("D:/UE/AIGameJam/VoiceCommand/Sonheim/Saved/BouncedWavFiles/Test.wav");
 	TArray<uint8> BinaryData;
 	LoadWavFileBinary(FilePath, BinaryData);
 
