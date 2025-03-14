@@ -141,6 +141,16 @@ public:
 	// 얼굴 변화
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeFace(int32 Feel);
+
+	// AI Voice Command
+	UFUNCTION(BlueprintCallable)
+	void AIVoiceCommand(int ResourceID, bool IsForced = false);
+
+	UFUNCTION()
+	class ABaseResourceObject* GetNearResourceObject(int ResourceID);
+
+	void SetIsForced(bool IsForced);
+	bool bIsForced = false;
 	
 	// Skill
 	void RemoveSkillEntryByID(const int id);
@@ -169,4 +179,7 @@ protected:
 	virtual void OnDie() override;
 
 	virtual void InitializeHUD();
+
+	float WalkSpeed = 400.f;
+	float ForcedWalkSpeed = 1200.f;
 };
