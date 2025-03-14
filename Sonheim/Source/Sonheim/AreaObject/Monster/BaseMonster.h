@@ -44,10 +44,24 @@ public:
 
 	// 몬스터 속도 변화
 	bool bIsWarning{false};
+
+	// 놀라기
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsSurprise{false};
+
+	// Resource
+	int32 GotResource{};
+
+	// 운반 중?
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsTransporting{false};
 	
 	UPROPERTY()
 	FTimerHandle OnDieHandle;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMeshComponent* PickaxeMesh;
+	
 	virtual float DecreaseHP(float Delta) override;
 	virtual float DecreaseStamina(float Delta, bool bIsDamaged = true) override;
 	void SetHPWidgetVisibility(bool IsVisible);
@@ -70,7 +84,7 @@ protected:
 	float SightRadius = 1500.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Sight")
 	float LoseSightRadius = 1500.f;
-	
+
 private:
 	UPROPERTY()
 	AActor* m_CurrentTarget;
@@ -118,11 +132,34 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Resource")
 	virtual void SetResourceTarget(ABaseResourceObject* NewTarget) { m_ResourceTarget = NewTarget; }
+
+	// 놀라기
+	void Surprise();
+	void CalmDown();
+
+	// 짐 들기
+	void StartTransport();
+	void EndTransport();
+	
+	// 얼굴 변화
+	UFUNCTION(BlueprintImplementableEvent,BlueprintCallable)
+	void ChangeFace(int32 Feel);
+
+	// AI Voice Command
+	UFUNCTION(BlueprintCallable)
+	void AIVoiceCommand(int ResourceID, bool IsForced = false);
+
+	UFUNCTION(BlueprintCallable)
+	class ABaseResourceObject* GetNearResourceObject(int ResourceID);
+
+	void SetIsForced(bool IsForced);
+	bool bIsForced = false;
 	
 	// Skill
 	void RemoveSkillEntryByID(const int id);
 	void AddSkillEntryByID(const int id);
-
+	
+	
 	/*
 	// AI Perception 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
@@ -146,4 +183,7 @@ protected:
 	virtual void OnDie() override;
 
 	virtual void InitializeHUD();
+
+	float WalkSpeed = 400.f;
+	float ForcedWalkSpeed = 1200.f;
 };

@@ -11,6 +11,7 @@
 #include "http.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
+#include "Sonheim/AreaObject/Attribute/LevelComponent.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
 #include "Sonheim/AreaObject/Utility/GhostTrail.h"
 #include "Sonheim/Utilities/LogMacro.h"
@@ -136,6 +137,7 @@ void ASonheimPlayer::OnRevival()
 void ASonheimPlayer::Reward(int ItemID, int ItemValue) const
 {
 	S_PlayerState->AddItem(ItemID, ItemValue);
+	m_LevelComponent->AddExp(10);
 }
 
 // Called every frame

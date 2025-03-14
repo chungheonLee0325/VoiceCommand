@@ -6,6 +6,7 @@
 #include "Lumbering.h"
 #include "SelectAction.h"
 #include "WaitState.h"
+#include "Sonheim/AreaObject/Monster/AI/Derived/CommonState/DoNothing.h"
 
 
 // Sets default values for this component's properties
@@ -55,6 +56,9 @@ void ULamballFSM::InitStatePool()
 	// ReturnResource 
 	auto ReturnResource = CreateState<ULumbering>(this, m_Owner, EAiStateType::Lumbering);
 	AddState(EAiStateType::ReturnResource, ReturnResource);
+
+	auto DoNothing =  CreateState<UDoNothing>(this, m_Owner);
+	AddState(EAiStateType::DoNothing, DoNothing);
 
 	// 시작 State
 	ChangeState(EAiStateType::Wait);

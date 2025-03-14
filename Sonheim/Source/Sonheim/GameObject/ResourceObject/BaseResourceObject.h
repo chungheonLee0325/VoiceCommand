@@ -27,12 +27,14 @@ public:
 	void SpawnPartialResources(int32 SegmentsLost);
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator,
 							  AActor* DamageCauser) override;
+	
+	UPROPERTY(EditAnywhere)
+	int m_ResourceObjectID = 0;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-	int m_ResourceObjectID = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UBoxComponent* m_BoxComponent;

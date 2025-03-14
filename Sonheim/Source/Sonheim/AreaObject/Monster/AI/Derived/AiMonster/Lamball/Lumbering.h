@@ -32,6 +32,7 @@ public:
 	
 	bool bIsMoving{false};
 	bool bIsLumbering{false};
+	bool HasItem{false};
 	
 	float ActionTime{0.f};
 	float LumberingTime{3.f};
@@ -39,4 +40,16 @@ public:
 	
 	UPROPERTY()
 	AActor* Target{nullptr};
+
+	UPROPERTY()
+	TArray<AActor*> TargetArr;
+
+	UPROPERTY()
+	TArray<AActor*> ItemArr;
+
+	UPROPERTY()
+	TArray<ABaseItem*> HaveItemArr;
+
+	UPROPERTY()
+	TArray<AActor*> AttachedActors;
 };

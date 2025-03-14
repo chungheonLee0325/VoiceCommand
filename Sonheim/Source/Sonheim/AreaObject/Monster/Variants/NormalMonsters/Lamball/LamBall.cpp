@@ -23,12 +23,14 @@ ALamBall::ALamBall()
 	if (TempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -40), FRotator(0, -90, 0));
-		GetMesh()->SetRelativeScale3D(FVector(0.3f));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+		GetMesh()->SetRelativeScale3D(FVector(0.7f));
 	}
+
+	PickaxeMesh->SetupAttachment(GetMesh(), "Pickaxe");
 	
-	GetCapsuleComponent()->SetCapsuleRadius(35.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(40.f);
+	GetCapsuleComponent()->SetCapsuleRadius(90.f);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
 }
 
