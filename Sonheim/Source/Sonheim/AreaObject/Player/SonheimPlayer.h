@@ -69,9 +69,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// WAV 파일을 서버로 전송하는 함수
-	UFUNCTION(BlueprintCallable, Category = "Audio")
+	// WAV 파일을 로드하고 바이너리 데이터로 전환
+	void LoadWavFileBinary(const FString& FilePath, TArray<uint8>& BinaryData);
+
+	// WAV 파일을 multipart/form-data 형식으로 전송
+	void SendWavFileAsFormData(const TArray<uint8>& BinaryData);
+
+	// WAV 파일을 직접 전송하는 함수
 	void SendWavFileDirectly();
+
+
 
 
 	/** Returns CameraBoom subobject **/
@@ -252,13 +259,8 @@ private:
 	// 마지막 체크포인트 회전
 	UPROPERTY(VisibleAnywhere, Category = "Checkpoint")
 	FRotator LastCheckpointRotation = FRotator::ZeroRotator;
-
+	
 private:
-	void LoadWavFileBinary(const FString& FilePath, TArray<uint8>& BinaryData); // WAV 파일 로드
-	void SendBinaryDataToServer(const TArray<uint8>& BinaryData); // 바이너리 데이터를 서버로 전송
+	TArray<uint8> FStringToUint8(FString str);
 
-
-// private:
-// 	// 타이머 핸들
-// 	FTimerHandle TimerHandle_SendWav;
 };
