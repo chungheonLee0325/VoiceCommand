@@ -1,0 +1,22 @@
+{
+    "tasks": [
+      {
+        "name": "Lumbering",
+        "description": "Chopping down trees for wood.",
+        "targets": ["Tree"],
+        "destination": "Logging Site"
+      },
+      {
+        "name": "Mining",
+        "description": "Extracting minerals and ores.",
+        "targets": ["Stone", "Ore"],
+        "destination": "Stone Pit"
+      },
+      {
+        "name": "Transporting",
+        "description": "Moving items to designated locations.",
+        "targets": ["Item"],
+        "destination": "Storage"
+      }
+    ]
+  }

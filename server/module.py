@@ -35,7 +35,7 @@ def generate_unreal_code(text: str) -> str:
 
 #Pydantic 객체 프롬프트/ 파서 등 llm에 필요한 class및 메서드
 class JSONparser(BaseModel):
-    actor: str = Field(description="명령할 팰 ['Lamball', 'Pengullet', 'anyone']")
-    work: str =Field(...,description="수행할 액션 ['Lumbering', 'Mining', 'Transporting', 'Handwork', 'Kindling', 'Planting', 'Watering', 'Gathering']")
-    target: str = Field(description="액션을 수행할 객체 ['Ore','Stone','Sulfur','Coal','Wood','Tree']")
+    actor: str = Field(description="명령할 팰 ['Lamball', 'Everyone' , 'Anyone']")
+    work: str =Field(...,description="수행할 액션 ['Lumbering', 'Mining']")
+    target: str = Field(description="액션을 수행할 객체 ['Ore','Stone','Anyone','Tree']")
     forced: bool = Field(description="강제성이나 긴급함 여부 [True,False]")
