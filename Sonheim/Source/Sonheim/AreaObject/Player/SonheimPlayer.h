@@ -67,6 +67,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void SendWavFileAsJson();
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -244,4 +247,11 @@ private:
 	// 마지막 체크포인트 회전
 	UPROPERTY(VisibleAnywhere, Category = "Checkpoint")
 	FRotator LastCheckpointRotation = FRotator::ZeroRotator;
+
+	
+	private : 
+
+	void LoadWavFile(const FString& FilePath, TArray<uint8>& BinaryData); // WAV 파일을 로드하는 함수 선언
+	void EncodeToBase64(const TArray<uint8>& BinaryData, FString& Base64EncodedData); // WAV 데이터를 Base64로 인코딩하는 함수 선언
+	void SendJsonData(const FString& JsonString); // JSON 데이터를 서버로 전송하는 함수 선언
 };
