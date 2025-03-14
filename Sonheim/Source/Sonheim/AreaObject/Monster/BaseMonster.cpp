@@ -11,10 +11,12 @@
 #include "AIController.h"
 #include "BaseSkillRoulette.h"
 #include "AI/Base/BaseAIController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Sonheim/AreaObject/Attribute/StaminaComponent.h"
 #include "Sonheim/AreaObject/Player/SonheimPlayer.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
 #include "Sonheim/GameManager/SonheimGameInstance.h"
+#include "Sonheim/GameObject/ResourceObject/BaseResourceObject.h"
 #include "Sonheim/UI/Widget/BaseStatusWidget.h"
 #include "Sonheim/UI/Widget/Monster/MonsterStatusWidget.h"
 
@@ -130,9 +132,12 @@ UBaseSkillRoulette* ABaseMonster::CreateSkillRoulette()
 void ABaseMonster::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	WalkSpeed = dt_AreaObject->WalkSpeed;
+	ForcedWalkSpeed = WalkSpeed * 3.f;
+
 	AIController = Cast<AAIController>(GetController());
-	
+
 	// HP UI 위치, Visible Setting
 	if (dt_AreaObject->EnemyType != EEnemyType::Boss)
 	{
@@ -309,6 +314,60 @@ void ABaseMonster::StartTransport()
 void ABaseMonster::EndTransport()
 {
 	bIsTransporting = false;
+}
+
+void ABaseMonster::AIVoiceCommand(int ResourceID, bool IsForced)
+{
+	ABaseResourceObject* Target = nullptr;
+	// Tree
+	if (ResourceID == 1 || ResourceID == 5 || ResourceID == 10)
+	{
+		Target = GetNearResourceObject(ResourceID);
+	}
+	else
+	{
+		FLog::Log("Wrong ResourceID");
+		return;
+	}
+
+	m_AiFSM->ChangeState(EAiStateType::SelectAction);
+	SetIsForced(IsForced);
+}
+
+void ABaseMonster::SetIsForced(bool IsForced)
+{
+	if (IsForced == true)
+	{
+		ChangeFace(2);
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
+	else
+	{
+		ChangeFace(0);
+		GetCharacterMovement()->MaxWalkSpeed = ForcedWalkSpeed;
+	}
+}
+
+class ABaseResourceObject* ABaseMonster::GetNearResourceObject(int ResourceID)
+{
+	TArray<AActor*> TargetArr;
+	ABaseResourceObject* Target = nullptr;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseResourceObject::StaticClass(), TargetArr);
+
+	// 나중에 동적으로 받으면 지우기
+	// GotResource = 5;
+
+	for (auto FindTarget : TargetArr)
+	{
+		auto BaseResourceTarget = Cast<ABaseResourceObject>(FindTarget);
+
+		if (BaseResourceTarget->m_ResourceObjectID == ResourceID)
+		{
+			Target = BaseResourceTarget;
+			SetResourceTarget(Target);
+		}
+	}
+	return Target;
 }
 
 void ABaseMonster::RemoveSkillEntryByID(const int id)
