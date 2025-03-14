@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "http.h"
 #include "Kismet/GameplayStatics.h"
+#include "JsonObjectConverter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Attribute/LevelComponent.h"
@@ -147,32 +148,117 @@ void ASonheimPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// T키를 눌렀을 때 WAV 파일 전송 테스트
 	if (GetWorld()->GetFirstPlayerController()->WasInputKeyJustPressed(EKeys::T))
 	{
-		SendWavFileAsJson(); 
-		// 'T' 키가 눌렸을 때 WAV 파일을 JSON으로 전송하는 함수 호출
+		SendWavFileDirectly();
+	}
+	
+}
+
+// WAV 파일을 로드하고 바이너리 데이터로 전환
+void ASonheimPlayer::LoadWavFileBinary(const FString& FilePath, TArray<uint8>& BinaryData)
+{
+	// WAV 파일을 로드
+	if (!FFileHelper::LoadFileToArray(BinaryData, *FilePath))
+	{
+		// 로드 실패 시 로그 출력
+		UE_LOG(LogTemp, Error, TEXT("Failed to load WAV file from path: %s"), *FilePath);
+		return;
+	}
+
+	// 로드 성공 시 로그 출력
+	UE_LOG(LogTemp, Log, TEXT("Successfully loaded WAV file: %s"), *FilePath);
+}
+
+
+TArray<uint8> ASonheimPlayer::FStringToUint8(FString str)
+{
+	TArray<uint8> outBytes;
+
+	FTCHARToUTF8 converted(*str);
+	outBytes.Append(reinterpret_cast<const uint8*>(converted.Get()), converted.Length());
+
+	return outBytes;
+}
+
+
+// WAV 파일을 multipart/form-data 형식으로 전송
+void ASonheimPlayer::SendWavFileAsFormData(const TArray<uint8>& BinaryData)
+{
+	// boundary 설정
+	FString Boundary = "---------------------------boundary";
+	FString FilePath = TEXT("Test.wav"); // WAV 파일 이름
+	FString Key = TEXT("file"); // key 이름
+
+	// 요청 본문 생성
+	FString Body;
+	Body += TEXT("--") + Boundary + TEXT("\r\n");
+	Body += TEXT("Content-Disposition: form-data; name=\"") + Key + TEXT("\"; filename=\"") + FilePath + TEXT("\"\r\n");
+	Body += TEXT("Content-Type: audio/wav\r\n\r\n");
+
+	// WAV 파일 바이너리 데이터 추가
+	TArray<uint8> FullData;
+	FullData.Append(FStringToUint8(Body));
+	FullData.Append(BinaryData);
+
+	// boundary 끝 표시
+	FString EndBoundary = TEXT("\r\n--") + Boundary + TEXT("--\r\n");
+	FullData.Append(FStringToUint8(EndBoundary));
+
+	// 요청 생성
+	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
+	Request->SetURL(TEXT("192.168.20.56:72/convert-audio")); // 서버 URL
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("multipart/form-data; boundary=") + Boundary);
+	Request->SetContent(FullData);
+
+	// 요청 완료 콜백 설정
+	Request->OnProcessRequestComplete().BindLambda(
+		[](FHttpRequestPtr Req, FHttpResponsePtr Res, bool bWasSuccessful)
+		{
+			if (bWasSuccessful && Res.IsValid())
+			{
+				FAIVoiceOrder InfoArray;
+				FString string = *Res->GetContentAsString();
+
+				// ToDo : 처리
+				FJsonObjectConverter::JsonObjectStringToUStruct(string, &InfoArray);
+				
+				// 성공 시 로그 출력
+				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! Response: %s"), *Res->GetContentAsString());
+				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 1: %hhd"), InfoArray.actor);
+				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 2: %hhd"), InfoArray.forced);
+				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 3: %hhd"), InfoArray.target);
+				UE_LOG(LogTemp, Log, TEXT("Successfully sent WAV file! 4: %hhd"), InfoArray.work);
+				
+			}
+			else
+			{
+				// 실패 시 로그 출력
+				UE_LOG(LogTemp, Error, TEXT("Failed to send WAV file. Response Code: %d"), Res.IsValid() ? Res->GetResponseCode() : -1);
+			}
+		});
+
+	// 요청 실행
+	Request->ProcessRequest();
+}
+
+void ASonheimPlayer::SendWavFileDirectly()
+{
+	// Wav 파일 전송 로직
+	UE_LOG(LogTemp, Log, TEXT("Wav 파일 전송 시작!"));
+	
+	FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	TArray<uint8> BinaryData;
+	LoadWavFileBinary(FilePath, BinaryData);
+
+	if (BinaryData.Num() > 0)
+	{
+		SendWavFileAsFormData(BinaryData);
 	}
 }
 
-void ASonheimPlayer::SendWavFileAsJson()
-{
-	FString FilePath = FPaths::ProjectSavedDir() + TEXT("BouncedWavFiles/Test.wav");
-	// 저장된 WAV 파일의 경로를 지정 (Saved 폴더 내 Test.wav)
-
-	TArray<uint8> BinaryData;
-	LoadWavFile(FilePath, BinaryData);
-	// 지정된 경로에서 WAV 파일을 로드하고 바이너리 데이터 배열에 저장
-
-	FString Base64EncodedData;
-	EncodeToBase64(BinaryData, Base64EncodedData);
-	// 로드된 바이너리 데이터를 Base64 형식으로 인코딩
-
-	FString JsonString = FString::Printf(TEXT("{\"audio\":\"%s\"}"), *Base64EncodedData);
-	// Base64 인코딩된 데이터를 JSON 문자열로 변환 (키: audio)
-	
-	SendJsonData(JsonString);
-	// JSON 데이터를 서버로 전송
-}
 
 void ASonheimPlayer::InitializeStateRestrictions()
 {
@@ -228,57 +314,7 @@ bool ASonheimPlayer::CanPerformAction(EPlayerState State, FString ActionName)
 	return false;
 }
 
-void ASonheimPlayer::LoadWavFile(const FString& FilePath, TArray<uint8>& BinaryData)
-{
-	if (!FFileHelper::LoadFileToArray(BinaryData, *FilePath))
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to load WAV file from path: %s"), *FilePath);
-		return;
-		// 지정된 경로에서 WAV 파일을 로드실패 
-	}
-}
 
-void ASonheimPlayer::EncodeToBase64(const TArray<uint8>& BinaryData, FString& Base64EncodedData)
-{
-	Base64EncodedData = FBase64::Encode(BinaryData);
-	// 바이너리 데이터를 Base64 형식으로 인코딩하여 문자열에 저장
-}
-
-void ASonheimPlayer::SendJsonData(const FString& JsonString)
-{
-	FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
-	// HTTP 요청 객체 생성
-
-	Request->SetURL(TEXT("http://192.168.20.56:72/generate_Json"));
-	// 요청할 서버의 URL 설정
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! AI 분들께 아침에 받으면 넣어서 테스트 꼭 해보기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	
-	Request->SetVerb(TEXT("POST"));
-	// HTTP 요청 방식을 POST로 설정
-
-	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	// 요청 헤더에 Content-Type을 application/json으로 설정
-	
-	Request->SetContentAsString(JsonString);
-	// 요청 본문에 JSON 문자열 추가
-
-	Request->OnProcessRequestComplete().BindLambda(
-		[](FHttpRequestPtr Req, FHttpResponsePtr Res, bool bWasSuccessful)
-		{
-			if (bWasSuccessful && Res.IsValid())
-			{
-				UE_LOG(LogTemp, Log, TEXT("Successfully sent JSON data! Response: %s"), *Res->GetContentAsString());
-				// 요청이 성공
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Failed to send JSON data."));
-				// 요청이 실패
-			}
-		});
-
-	Request->ProcessRequest();
-}
 
 void ASonheimPlayer::SetComboState(bool bCanCombo, int SkillID)
 {

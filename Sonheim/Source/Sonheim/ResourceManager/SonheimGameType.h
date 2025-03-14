@@ -50,7 +50,7 @@ enum class EAIVoiceActor : uint8
 	None UMETA(DisplayName = "None"), // 블루프린트에서 표시될 이름
 	Anyone UMETA(DisplayName = "Anyone"),
 	Everyone UMETA(DisplayName = "Everyone"),
-	LambBall UMETA(DisplayName = "LambBall"),
+	Lamball UMETA(DisplayName = "LambBall"),
 };
 
 UENUM(BlueprintType)
@@ -639,6 +639,24 @@ struct FResourceObjectData : public FTableRowBase
 	// 시각적 표현을 위한 메시
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Visual")
 	UStaticMesh* ResourceMesh = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FAIVoiceOrder
+{
+	GENERATED_BODY()
+	//"actor":"Lamball","work":"Lumbering","target":"Tree","forced":false}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	EAIVoiceActor actor = EAIVoiceActor::None;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	EWorkTrait work = EWorkTrait::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	EAIVoiceTarget target = EAIVoiceTarget::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	bool forced = false;
 };
 
 
