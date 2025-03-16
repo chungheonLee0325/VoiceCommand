@@ -483,6 +483,7 @@ void ASonheimPlayer::RespawnAtCheckpoint()
 
 void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 {
+	PlayAnimMontage(CommandMontage);
 	if (AIVoiceOrder.work == EWorkTrait::GatherToPlayer)
 	{
 		if (AIVoiceOrder.actor == EAIVoiceActor::Everyone)
@@ -519,7 +520,6 @@ void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 				}
 			}
 		}
-		
 		return;
 	}
 	
@@ -541,9 +541,6 @@ void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 	{
 		TArray<AActor*> TargetArr;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
-
-		// 나중에 동적으로 받으면 지우기
-		// GotResource = 5;
 
 		for (auto FindTarget : TargetArr)
 		{

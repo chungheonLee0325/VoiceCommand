@@ -39,6 +39,7 @@ void ALamBall::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ChangeFace(0);
 }
 
 // Called every frame

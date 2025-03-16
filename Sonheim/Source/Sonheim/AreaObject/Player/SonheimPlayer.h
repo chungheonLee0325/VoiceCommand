@@ -137,6 +137,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* VFX_LevelUP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* CommandMontage;
 
 	TArray<ABaseMonster*> FindClosestIdleMonster(int MonsterID);
 	TArray<ABaseMonster*> FindVisibleOrClosestIdlePal(int MonsterID);
