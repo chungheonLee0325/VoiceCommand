@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "name": "Lamball",
+        "work_traits": {
+            "Handwork": 1,
+            "Transporting": 1,
+            "Ranching": 1
+        },
+        "partner_skill": "Fluffy Shield - Turns into a shield that attaches to the player. Can be placed on a ranch to produce wool.",
+        "partner_item": null,
+        "attributes": [
+            "None"
+        ],
+        "food_consumption": null,
+        "drop_items": [
+            "Wool"
+        ],
+        "production_items": [
+            "Wool"
+        ],
+        "description": "It rolls down hills by itself. Once dizzy, it becomes easy prey at the bottom of the food chain."
+    }
+]

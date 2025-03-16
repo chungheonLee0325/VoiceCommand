@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Stone",
+        "category": "Material",
+        "class": "Common",
+        "weight": 3,
+        "description": "Used as a building or crafting material. Can be obtained by mining stone."
+    },
+    {
+        "name": "Wood",
+        "category": "Material",
+        "class": "Common",
+        "weight": 3,
+        "description": "Used as a building or crafting material. Mainly obtained by lumbering trees."
+    },
+    {
+        "name": "Ore",
+        "category": "Material",
+        "class": "Common",
+        "weight": 8,
+        "description": "Can be smelted into ingots in a furnace. Found in caves. Some Pals can detect ores."
+    }
+]
+
+
+
