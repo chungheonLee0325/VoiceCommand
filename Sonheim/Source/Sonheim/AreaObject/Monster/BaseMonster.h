@@ -70,6 +70,9 @@ public:
 	void SetHPWidgetVisibilityByDuration(float Duration);
 	FTimerHandle HPWidgetVisibleTimer;
 
+	UPROPERTY(VisibleAnywhere)
+	UBaseAiFSM* m_AiFSM;
+
 protected:
 	// Combat System
 	UPROPERTY()
@@ -78,8 +81,7 @@ protected:
 	ABaseResourceObject* m_ResourceTarget;
 	UPROPERTY()
 	FVector m_SpawnLocation;
-	UPROPERTY(VisibleAnywhere)
-	UBaseAiFSM* m_AiFSM;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Skill")
 	UBaseSkillRoulette* m_SkillRoulette;
 
@@ -204,6 +206,7 @@ protected:
 	virtual void OnDie() override;
 
 	virtual void InitializeHUD();
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	float WalkSpeed = 400.f;
 	float ForcedWalkSpeed = 1200.f;

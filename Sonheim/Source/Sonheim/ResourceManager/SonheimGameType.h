@@ -80,6 +80,8 @@ enum class EWorkTrait : uint8
 {
 	None UMETA(DisplayName = "None"),
 
+	GatherToPlayer UMETA(DisplayName = "GatherToPlayer"),
+
 	Lumbering UMETA(DisplayName = "Lumbering"),
 	Mining UMETA(DisplayName = "Mining"),
 	Transporting UMETA(DisplayName = "Transporting"),

@@ -3,6 +3,7 @@
 
 #include "LamballFSM.h"
 
+#include "GatherToPlayer.h"
 #include "Lumbering.h"
 #include "SelectAction.h"
 #include "WaitState.h"
@@ -59,6 +60,10 @@ void ULamballFSM::InitStatePool()
 
 	auto DoNothing =  CreateState<UDoNothing>(this, m_Owner);
 	AddState(EAiStateType::DoNothing, DoNothing);
+
+	// SelectAction 
+	auto GatherToPlayer = CreateState<UGatherToPlayer>(this, m_Owner);
+	AddState(EAiStateType::Chase, GatherToPlayer);
 
 	// 시작 State
 	ChangeState(EAiStateType::Wait);

@@ -138,6 +138,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* VFX_LevelUP;
 
+	TArray<ABaseMonster*> FindClosestIdleMonster(int MonsterID);
+	TArray<ABaseMonster*> FindVisibleOrClosestIdlePal(int MonsterID);
+	
 	void Reward(int ItemID, int ItemValue) const;
 	
 

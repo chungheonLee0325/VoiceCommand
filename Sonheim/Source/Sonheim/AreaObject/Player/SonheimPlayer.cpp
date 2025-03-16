@@ -15,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Sonheim/Animation/Player/PlayerAniminstance.h"
 #include "Sonheim/AreaObject/Attribute/LevelComponent.h"
+#include "Sonheim/AreaObject/Monster/AI/Base/BaseAiFSM.h"
 #include "Sonheim/AreaObject/Monster/Variants/NormalMonsters/Lamball/LamBall.h"
 #include "Sonheim/AreaObject/Skill/Base/BaseSkill.h"
 #include "Sonheim/AreaObject/Utility/GhostTrail.h"
@@ -251,9 +252,9 @@ void ASonheimPlayer::SendWavFileDirectly()
 	// Wav 파일 전송 로직
 	UE_LOG(LogTemp, Log, TEXT("Wav 파일 전송 시작!"));
 
-	//FString FilePath = TEXT("D:/UE/TeamProject_AI/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	FString FilePath = TEXT("D:/UE/TeamProject_AI/Sonheim/Saved/BouncedWavFiles/Test.wav");
 	//FString FilePath = TEXT("C:/AIPW/Sonheim/Saved/BouncedWavFiles/Test.wav");
-	FString FilePath = TEXT("D:/UE/AIGameJam/VoiceCommand/Sonheim/Saved/BouncedWavFiles/Test.wav");
+	//FString FilePath = TEXT("D:/UE/AIGameJam/VoiceCommand/Sonheim/Saved/BouncedWavFiles/Test.wav");
 	TArray<uint8> BinaryData;
 	LoadWavFileBinary(FilePath, BinaryData);
 
@@ -482,6 +483,46 @@ void ASonheimPlayer::RespawnAtCheckpoint()
 
 void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 {
+	if (AIVoiceOrder.work == EWorkTrait::GatherToPlayer)
+	{
+		if (AIVoiceOrder.actor == EAIVoiceActor::Everyone)
+		{
+			TArray<AActor*> TargetArr;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
+
+			for (auto FindTarget : TargetArr)
+			{
+				auto lamball = Cast<ALamBall>(FindTarget);
+				
+				lamball->SetIsForced(AIVoiceOrder.forced);
+				lamball->m_AiFSM->StopFSM();
+				lamball->m_AiFSM->ChangeState(EAiStateType::Chase);
+			}
+		}
+		else
+		{
+			auto monsterArray = FindVisibleOrClosestIdlePal(0);
+
+			if (monsterArray.Num() == 0)
+			{
+				return;
+			}
+			for (auto monster : monsterArray)
+			{
+				float dist = FVector::Distance(monster->GetActorLocation(),this->GetActorLocation());
+				if (dist > 320.f)
+				{
+					monster->SetIsForced(AIVoiceOrder.forced);
+					monster->m_AiFSM->StopFSM();
+					monster->m_AiFSM->ChangeState(EAiStateType::Chase);
+					return;
+				}
+			}
+		}
+		
+		return;
+	}
+	
 	int itemID = 0;
 	if (AIVoiceOrder.target == EAIVoiceTarget::Ore)
 	{
@@ -513,29 +554,138 @@ void ASonheimPlayer::HandleAIVoiceOrder(FAIVoiceOrder AIVoiceOrder)
 	}
 	else
 	{
-		TArray<AActor*> TargetArr;
-		ALamBall* Target = nullptr;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALamBall::StaticClass(), TargetArr);
+		auto monsterArray = FindVisibleOrClosestIdlePal(0);
 
-		// 나중에 동적으로 받으면 지우기
-		// GotResource = 5;
-
-		for (auto FindTarget : TargetArr)
+		if (monsterArray.Num() == 0)
 		{
-			auto lamball = Cast<ALamBall>(FindTarget);
-
-			if (lamball->IsWorked == true)
-			{
-				continue;
-			}
-			lamball->AIVoiceCommand(itemID, AIVoiceOrder.forced);
 			return;
 		}
+		monsterArray[0]->AIVoiceCommand(itemID, AIVoiceOrder.forced);
 	}
 }
 
 void ASonheimPlayer::VFXSpawnLevelUP()
 {
-	FVector VFXLocation = GetActorLocation() + FVector::UpVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_LevelUP, VFXLocation);
+	FVector VFXLocation = GetActorLocation() - FVector::UpVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), VFX_LevelUP, VFXLocation, FRotator(0, 0, 0), FVector(2));
+}
+
+TArray<ABaseMonster*> ASonheimPlayer::FindClosestIdleMonster(int MonsterID)
+{
+    TArray<AActor*> TargetArr;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseMonster::StaticClass(), TargetArr);
+    
+    // 플레이어 위치 가져오기
+    FVector PlayerLocation = GetActorLocation();
+    
+    // 일하지 않는 LamBall만 필터링
+    TArray<ABaseMonster*> IdleMonster;
+    for (auto FindTarget : TargetArr)
+    {
+        auto monster = Cast<ABaseMonster>(FindTarget);
+        if (monster && !monster->IsWorked)
+        {
+            IdleMonster.Add(monster);
+        }
+    }
+    
+    // 거리에 따라 정렬
+    IdleMonster.Sort([PlayerLocation](const ABaseMonster& A, const ABaseMonster& B)
+    {
+        float DistanceA = FVector::DistSquared(A.GetActorLocation(), PlayerLocation);
+        float DistanceB = FVector::DistSquared(B.GetActorLocation(), PlayerLocation);
+        return DistanceA < DistanceB;
+    });
+
+	return IdleMonster;
+}
+
+// 알고리즘 2: 화면에 보이는 LamBall 우선, 그 다음 거리순
+TArray<ABaseMonster*> ASonheimPlayer::FindVisibleOrClosestIdlePal(int MonsterID)
+{
+    TArray<AActor*> TargetArr;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseMonster::StaticClass(), TargetArr);
+
+	// 화면에 보이는 LamBall과 보이지 않는 LamBall 분리
+	TArray<ABaseMonster*> VisibleIdleMonster;
+	TArray<ABaseMonster*> NonVisibleIdleMonster;
+    
+    // 플레이어 위치 및 카메라 정보 가져오기
+    APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+    if (!PlayerController) return VisibleIdleMonster;
+    
+    FVector PlayerLocation = GetActorLocation();
+    
+
+    
+    for (auto FindTarget : TargetArr)
+    {
+        auto monster = Cast<ABaseMonster>(FindTarget);
+        if (!monster || monster->IsWorked)
+        {
+            continue;
+        }
+        
+        // 화면에 보이는지 확인
+        FVector monsterLocation = monster->GetActorLocation();
+        FVector2D ScreenPosition;
+        bool bIsOnScreen = PlayerController->ProjectWorldLocationToScreen(monsterLocation, ScreenPosition, true);
+        
+        // 화면에 보이는지, 가려져 있지 않은지 확인 (LineTrace로 확인)
+        bool bIsVisible = bIsOnScreen;
+        if (bIsOnScreen)
+        {
+            FHitResult HitResult;
+            FCollisionQueryParams QueryParams;
+            QueryParams.AddIgnoredActor(this);
+            
+            bool bHit = GetWorld()->LineTraceSingleByChannel(
+                HitResult,
+                PlayerLocation,
+                monsterLocation,
+                ECC_Visibility,
+                QueryParams
+            );
+            
+            // 플레이어와 LamBall 사이에 장애물이 없는 경우
+            bIsVisible = !bHit || (bHit && HitResult.GetActor() == monster);
+        }
+        
+        // 보이는 LamBall과 보이지 않는 LamBall 분류
+        if (bIsVisible)
+        {
+            VisibleIdleMonster.Add(monster);
+        }
+        else
+        {
+            NonVisibleIdleMonster.Add(monster);
+        }
+    }
+    
+    // 화면에 보이는 LamBall 거리순 정렬
+    VisibleIdleMonster.Sort([PlayerLocation](const ABaseMonster& A, const ABaseMonster& B)
+    {
+        float DistanceA = FVector::DistSquared(A.GetActorLocation(), PlayerLocation);
+        float DistanceB = FVector::DistSquared(B.GetActorLocation(), PlayerLocation);
+        return DistanceA < DistanceB;
+    });
+    
+    // 화면에 보이지 않는 LamBall 거리순 정렬
+    NonVisibleIdleMonster.Sort([PlayerLocation](const ABaseMonster& A, const ABaseMonster& B)
+    {
+        float DistanceA = FVector::DistSquared(A.GetActorLocation(), PlayerLocation);
+        float DistanceB = FVector::DistSquared(B.GetActorLocation(), PlayerLocation);
+        return DistanceA < DistanceB;
+    });
+    
+    // 화면에 보이는 LamBall이 있으면 가장 가까운 것을 선택
+    if (VisibleIdleMonster.Num() > 0)
+    {
+        return VisibleIdleMonster;
+    }
+    // 화면에 보이는 LamBall이 없으면 가장 가까운 보이지 않는 LamBall 선택
+    else
+    {
+        return NonVisibleIdleMonster;
+    }
 }

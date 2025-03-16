@@ -295,6 +295,19 @@ void ABaseMonster::InitializeHUD()
 	}
 }
 
+float ABaseMonster::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (damage > 0.f)
+	{
+		TArray<int> array = {1,5,10};
+		int index = FMath::RandRange(0, 2);
+		GetNearResourceObject(array[index]);
+	}
+	return damage;
+}
+
 void ABaseMonster::Surprise()
 {
 	if (bIsForced) return;
