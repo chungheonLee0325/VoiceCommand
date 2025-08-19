@@ -1,4 +1,4 @@
-# **Dororong Work — AI 음성 명령으로 즐기는 3D 자원 수집 게임 (UE, Whisper, Gemini)**
+# **Dororong World — AI 음성 명령으로 즐기는 3D 자원 수집 게임 (UE, Whisper, Gemini)**
 
 "도로롱, 제발 내 말좀 들어\!\!\!" — AI와 게임의 융합으로 구현한 직관적인 음성 명령 인터페이스
 
