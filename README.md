@@ -15,7 +15,7 @@
 ## **▶️ 데모 영상 (Gameplay Demo)**
 
  <p align="center">
- <a href="https://youtu.be/[VIDEO_ID]">
+ <a href="https://www.youtube.com/watch?v=cXoGXADRAa8">
  <img src="https://github.com/chungheonLee0325/VoiceCommand/raw/main/Document/Dororong World_resize.gif" alt="프로젝트 하이라이트 영상 GIF" width="100%">
  </a>
  </p>
