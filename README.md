@@ -27,7 +27,7 @@
 
 ---
 
-## ** 프로젝트 개요 (Overview)**
+## **프로젝트 개요 (Overview)**
 
 **Dororong World**는 `AI와 게임의 융합`을 주제로 진행된 2일 게임잼에서 만든 3D 자원 수집 게임입니다.
 
@@ -40,7 +40,7 @@
 
 ---
 
-## ** 담당 역할 및 주요 기여 (My Role & Contributions)**
+## **담당 역할 및 주요 기여 (My Role & Contributions)**
 
 ### **1. Unreal Engine Client / Gameplay 구현**
 
@@ -132,7 +132,7 @@ AI가 어떤 형태로 결과를 반환해야 게임이 처리할 수 있는지,
 
 ---
 
-## ** 주요 기능 (Key Features)**
+## **주요 기능 (Key Features)**
 
 ### **1. 자연어 음성 명령을 Gameplay Action으로 연결**
 
@@ -263,7 +263,7 @@ Ending
 
 ---
 
-## ** 구현에서 중요했던 점**
+## **구현에서 중요했던 점**
 
 ### **AI 출력과 게임 규칙 사이에 경계를 두었습니다**
 
@@ -292,7 +292,7 @@ AI Output
 
 ---
 
-## ** 프로젝트 범위와 한계**
+## **프로젝트 범위와 한계**
 
 이 프로젝트는 **2일 게임잼 Prototype**입니다.
 
@@ -310,7 +310,7 @@ AI Output
 
 ---
 
-## ** Result**
+## **Result**
 
 - **AI 융합 게임잼 1등**
 - **개발 기간: 2일**
@@ -320,7 +320,7 @@ AI Output
 
 ---
 
-## ** 게임 Full Play 영상**
+## **게임 Full Play 영상**
 
 <a href="https://youtu.be/3WRTNIxKzws">
 <img src="https://img.youtube.com/vi/3WRTNIxKzws/maxresdefault.jpg" alt="프로젝트 풀 영상" width="100%">
